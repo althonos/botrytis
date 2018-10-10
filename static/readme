@@ -1,0 +1,20 @@
+File Descriptions
+
+Assembly files:
+File Name				File Description
+contigs.fasta		Nucleotide sequence by contig.
+
+Annotation files:
+File Name	 File Description
+genes.fasta			Nucleotide sequence of gene predictions, including untranslated regions. (one entry per gene)
+transcripts.fasta					 Nucleotide sequence of transcripts, with all non-coding sequences removed. (may be more than one transcript per gene)
+proteins.fasta						 Amino acid sequence of proteins predicted to be encoded by the transcripts. (may be more than one protein per gene)
+
+genes_upstream_1000.fasta	 The nucleotide sequence 1000 nucleotides before the start codon for each gene prediction
+genes_downstream_1000.fasta		 The nucleotide sequence 1000 nucleotides after the stop codon for each gene prediction
+genes_upstream_utr_1000.fasta	 The nucleotide sequence 1000 nucleotides before the 5'UTR for each gene prediction
+genes_downstream_utr_1000.fasta		 The nucleotide sequence 1000 nucleotides after the 3'UTR for each gene prediction
+
+genome_summary.txt								 Feature file for each gene of gene coordinates and associated PFAM/TIGRfam annotations (one line per annotation).
+genome_summary_per_gene.txt				 Feature file for each gene of gene coordinates and associated PFAM/TIGRfam annotations (one line per gene).
+pfam_to_genes.txt									 PFAM domains mapped to predicted proteins by Hmmer.
