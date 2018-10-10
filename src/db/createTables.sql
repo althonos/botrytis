@@ -6,22 +6,20 @@ CREATE TABLE Gene(
     name TEXT,
     chromosome INTEGER,
     sequence TEXT,
-
     PRIMARY KEY(locus)
 );
 
-CREATE TABLE Annotations(
+CREATE TABLE Annotation(
     locus CHAR(10),
     accession VARCHAR(10),
     name TEXT,
     description TEXT,
-    start INTEGER,
-    stop INTEGER,
-    length INTEGER,
+    length INTEGER CHECK (length >= 0),
+    start INTEGER CHECK (start >= 0),
+    stop INTEGER CHECK (stop >= start),
     score DOUBLE,
     expected DOUBLE,
-
-    FOREIGN KEY(locus) REFERENCES Gene(locus)
+    FOREIGN KEY (locus) REFERENCES Gene(locus)
 );
 
 CREATE TABLE Protein(
