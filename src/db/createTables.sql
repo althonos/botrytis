@@ -1,11 +1,15 @@
 CREATE TABLE Gene(
-    locus CHAR(10),
-    length INTEGER CHECK (length >= 0),
-    start INTEGER CHECK (start >= 0),
-    stop INTEGER CHECK (stop >= start),
-    name TEXT,
+    locus      CHAR(10),
+    length     INTEGER CHECK (length >= 0),
+    start      INTEGER CHECK (start >= 0),
+    stop       INTEGER CHECK (stop >= start),
+    -- strand (true for direct, false otherwise)
+    strand     BOOLEAN,
+    name       TEXT,
     chromosome INTEGER,
-    sequence TEXT,
+    -- gene sequence
+    sequence   TEXT,
+
     PRIMARY KEY(locus)
 );
 
@@ -19,12 +23,16 @@ CREATE TABLE Annotation(
     stop INTEGER CHECK (stop >= start),
     score DOUBLE,
     expected DOUBLE,
+
     FOREIGN KEY (locus) REFERENCES Gene(locus)
 );
 
-CREATE TABLE Protein(
+CREATE TABLE Transcript(
     locus CHAR(10),
+
+    -- protein sequence
     product TEXT,
+    -- transcript sequence
     transcript TEXT,
 
     FOREIGN KEY(locus) REFERENCES Gene(locus)
