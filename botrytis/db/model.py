@@ -2,6 +2,10 @@
 
 import typing
 
+import Bio.Alphabet.IUPAC
+import Bio.Seq
+import Bio.SeqRecord
+
 
 class Gene(typing.NamedTuple):
     locus: str
@@ -12,6 +16,10 @@ class Gene(typing.NamedTuple):
     name: str
     chromosome: int
     sequence: int
+
+    def to_seq_record(self):
+        seq = Bio.Seq.Seq(self.sequence, alphabet=Bio.Alphabet.IUPAC.ambiguous_dna)
+        return Bio.SeqRecord.SeqRecord(seq, self.locus, description=self.name)
 
 
 class Annotation(typing.NamedTuple):
