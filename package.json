@@ -1,6 +1,7 @@
 {
   "license": "MIT",
   "dependencies": {
+    "EBI-Icon-fonts": "^1.3.0",
     "bootstrap": "^4.2.1"
   }
 }
