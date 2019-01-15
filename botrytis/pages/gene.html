@@ -63,7 +63,7 @@
             </div>
             {% macro download_button(name, format) -%}
               <div class="col-auto">
-                <a role="button" class="mb1 btn btn-outline-secondary" href="/download/{{ format }}/{{ v }}">
+                <a role="button" class="mb1 btn btn-outline-secondary" href="/download/{{ format }}/{{ gene.locus }}">
                   <span class="icon icon-functional icon-download"> Download ({{ name  }})</span>
                 </a>
               </div>

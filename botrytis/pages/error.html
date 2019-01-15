@@ -1,0 +1,33 @@
+<meta charset="UTF-8">
+
+<head>
+    {% include '_style.html' %}
+    <title>The Botrytis Viewer - 404 Not Found</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+{% block body %}
+
+  {% include 'navbar.html' %}
+
+  <main role="main" class="flex-shrink">
+    <div class="jumbotron">
+      <div class="row">
+          <div class="col-3">
+            <img class="img-fluid" src="/static/images/mushroom-sad.gif"/>
+          </div>
+          <div class="col md-auto">
+            <div class="row"><h1>This is definitely an error...</h1></div>
+            <div class="row"><hr class="primary"/></div>
+            <div class="row"><h2>{{ status }}</h2></div>
+            <div class="row">{{ message | sentence }}</div>
+          </div>
+      </div>
+    </div>
+  </main>
+
+  {% include 'footer.html' %}
+  {% include '_scripts.html' %}
+
+{% endblock %}
+</body>
