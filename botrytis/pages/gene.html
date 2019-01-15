@@ -1,7 +1,21 @@
-{% include 'navbar.html' %}
+<head>
+    {% include '_style.html' %}
+</head>
 
-<main role="main">
-  <h1 class="display-3">Hello, world!</h1>
-</main>
 
-{% include 'footer.html' %}
+<body>
+  {% include 'navbar.html' %}
+
+
+  <main role="main">
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">Hello, world!</h1>
+      </div>
+    </div>
+  </main>
+
+  {% include 'footer.html' %}
+  {% include '_scripts.html' %}
+
+</body>

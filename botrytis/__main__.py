@@ -1,5 +1,5 @@
 # coding: utf-8
-f"""botrytis - serve the Botrytis Genome Viewer.
+"""botrytis - serve the Botrytis Genome Viewer.
 
 Usage:
     botrytis [-p PORT] [-s STATIC]
@@ -12,13 +12,25 @@ Arguments:
 
 """
 
+import os
+
 import docopt
 import cherrypy
 
+from . import __name__
 from .server import BotrytisWebsite
 
 
 args = docopt.docopt(__doc__)
 
 
-cherrypy.quickstart(BotrytisWebsite())
+cherrypy.quickstart(
+    BotrytisWebsite(),
+    "/",
+    {
+        "/static": {
+            "tools.staticdir.on": True,
+            "tools.staticdir.dir": os.path.abspath(args['--static']),
+        },
+    }
+)

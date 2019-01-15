@@ -31,7 +31,6 @@ class BotrytisWebsite(object):
 
     @cherrypy.expose
     def gene(self, id=None):
-
         template = self.env.get_template('gene.html')
         return template.render()
 
