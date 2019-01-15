@@ -4,49 +4,28 @@ import contextlib
 import collections
 import itertools
 import os
+import pkg_resources
 import sqlite3
 
 import Bio.SeqIO
 import tqdm
 
-STATIC_DIR = os.path.abspath(os.path.join(__file__, '..', '..', '..', 'static'))
-
-Gene = collections.namedtuple("Gene", [
-    "locus",
-    "length",
-    "start",
-    "stop",
-    "strand",
-    "name",
-    "chromosome",
-    "sequence"
-])
-
-Annotation = collections.namedtuple("Annotation", [
-    "locus",
-    "accession",
-    "name",
-    "description",
-    "length",
-    "start",
-    "stop",
-    "score",
-    "expected",
-])
+from .model import Annotation, Gene, Transcript
 
 
-def load_indexed(filename):
-    return {
-        r.id: r
-        for r in Bio.SeqIO.parse(
-            os.path.join(STATIC_DIR, filename),
-            "fasta"
-        )
-    }
+_DEFAULT_OUTPUT = os.path.relpath(
+    pkg_resources.resource_filename(__name__, "botrytis.db"),
+    os.path.abspath(os.path.dirname(__file__))
+)
 
 
+def generate_db(static_dir, output=_DEFAULT_OUTPUT):
 
-if __name__ == "__main__":
+    def load_indexed(filename):
+        return {
+            r.id: r
+            for r in Bio.SeqIO.parse(os.path.join(static_dir, filename), "fasta")
+        }
 
     # Load genes records, proteins, transcripts
     records_g = load_indexed("genes.fasta")
@@ -61,7 +40,7 @@ if __name__ == "__main__":
 
     # Load genes from the genome summary
     genes = []
-    with open(os.path.join(STATIC_DIR, "genome_summary_per_gene.txt")) as f:
+    with open(os.path.join(static_dir, "genome_summary_per_gene.txt")) as f:
         for line in itertools.islice(f, 1, None):
             locus, _, _, length, start, stop, strand, name, chromosome, *_ = line.split('\t')
             seq = str(records_g[locus].seq)
@@ -69,7 +48,7 @@ if __name__ == "__main__":
 
     # Load annotations from the PFAM to genes mapping
     pfam = []
-    with open(os.path.join(STATIC_DIR, "pfam_to_genes.txt")) as f:
+    with open(os.path.join(static_dir, "pfam_to_genes.txt")) as f:
         for line in itertools.islice(f, 1, None):
             _, locus, contig, accession, name, description, start, stop, length, score, expected = line.strip().split('\t')
             pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(expected)))
@@ -82,8 +61,8 @@ if __name__ == "__main__":
     with contextlib.closing(sqlite3.connect("botrytis.db")) as sql:
 
         # Create tables
-        with open("createTables.sql") as f:
-            statements = f.read().split(';')
+        with pkg_resources.resource_stream(__name__, "generate.sql") as f:
+            statements = f.decode().read().split(';')
             for statement in statements:
                 sql.execute(statement)
 
