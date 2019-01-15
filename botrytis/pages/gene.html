@@ -1,16 +1,123 @@
+<meta charset="UTF-8">
+
 <head>
     {% include '_style.html' %}
+    <title>The Botrytis Viewer - {{ gene.locus }}</title>
 </head>
 
+<body class="d-flex flex-column h-100">
+{% block body %}
 
-<body>
   {% include 'navbar.html' %}
 
-
-  <main role="main">
+  <main role="main" class="flex-shrink">
     <div class="jumbotron">
       <div class="container">
-        <h1 class="display-3">Hello, world!</h1>
+
+        <!-- title box -->
+        <div style="background-color: #28a745;" class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-sm">
+          <div class="lh-100 secondary">
+            <h1 class="display-5 icon icon-conceptual icon-dna">
+              {{ gene.locus }} - <i>{{ gene.name }}</i>
+            </h1>
+          </div>
+        </div>
+
+
+        <!-- location box -->
+        <div id="location" class="rounded shadow-sm bg-white p-3">
+          <h2 class="mb1 text-info">Location</h2>
+          <div class="container">
+            <div class="row">
+              <div class="col-2 text-secondary">Chromosome:</div>
+              <div class="col" id="location-chr">{{ gene.chromosome }}</div>
+            </div>
+            <div class="row">
+              <div class="col-2 text-secondary">Start:</div>
+              <div class="col" id="location-start">{{ gene.start }}</div>
+            </div>
+            <div class="row">
+              <div class="col-2 text-secondary">Stop:</div>
+              <div class="col" id="location-stop">{{ gene.stop }}</div>
+            </div>
+            <div class="row">
+              <div class="col-2 text-secondary">Length:</div>
+              <div class="col" id="location-length">{{ gene.length }}</div>
+            </div>
+            <div class="row">
+              <div class="col-2 text-secondary">Strand:</div>
+              {% if gene.strand %}
+                <div class="col" id="location-length">+ (direct)</div>
+              {% else %}
+                <div class="col" id="location-length">- (reverse)</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- sequence box -->
+        <div id="sequence" class="rounded shadow-sm bg-white p-3 my-3">
+          <div class="row align-items-start">
+            <div class="col-auto mr-auto">
+              <h2 class="mb1 text-info">Sequence</h2>
+            </div>
+            {% macro download_button(name, format) -%}
+              <div class="col-auto">
+                <a role="button" class="mb1 btn btn-outline-secondary" href="/download/{{ format }}/{{ v }}">
+                  <span class="icon icon-functional icon-download"> Download ({{ name  }})</span>
+                </a>
+              </div>
+            {%- endmacro %}
+            {{ download_button("FASTA", "fasta") }}
+            {{ download_button("GenBank", "gb") }}
+          </div>
+          <!-- DEBUG-- <p id="width"></p> -->
+          <div class="container">
+            <div class="row align-items-start">
+              <div class="col-2" id="sequence-indexes"></div>
+              <div class="col" id="sequence-seq"></div>
+            </div>
+          </div>
+          <!-- a script to make sure the whole sequence is always readable even
+               when the window is resized -->
+          <script type="text/javascript">
+            var seq = "{{ gene.sequence }}";
+            // DEBUG var wid = document.getElementById("width");
+            var div_ind = document.getElementById("sequence-indexes");
+            var div_seq = document.getElementById("sequence-seq");
+            function pre_sequence() {
+              var w;
+              // DEBUG wid.textContent = window.innerWidth;
+              if (window.innerWidth >= 1200) {
+                w = 101;
+              } else if (window.innerWidth >= 992) {
+                w = 80;
+              } else if (window.innerWidth >= 768) {
+                w = 62;
+              } else if (window.innerWidth > 688) {
+                w = 40
+              } else if (window.innerWidth > 468) {
+                w = 30;
+              } else {
+                w = Math.floor(window.innerWidth / 14)
+              }
+              var di = "";
+              var ds = "<div class=\"row no-borders\">";
+              for (var i = 0; i < seq.length; i+=w) {
+                di += "<div class=\"row text-secondary\">" + i + "</div>";
+                ds += "<div class=\"row align-items-start text-monospace\">" + seq.slice(i, i+w) + "</div>";
+              }
+              div_ind.innerHTML = di;
+              div_seq.innerHTML = ds + "</div>";
+            }
+            window.onresize = pre_sequence;
+            pre_sequence();
+          </script>
+        </div>
+
+
+
+
       </div>
     </div>
   </main>
@@ -18,4 +125,5 @@
   {% include 'footer.html' %}
   {% include '_scripts.html' %}
 
+{% endblock %}
 </body>

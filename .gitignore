@@ -124,9 +124,9 @@ dmypy.json
 
 ### Yarn ###
 yarn.lock
-static/.yarn-integrity
+.yarn-integrity
 
 ### Dynamically installed static files ###
-static/bootstrap
+static/
 
 # End of https://www.gitignore.io/api/python,css,html,js,yarn
