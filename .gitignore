@@ -127,6 +127,6 @@ yarn.lock
 .yarn-integrity
 
 ### Dynamically installed static files ###
-static/
+ext/
 
 # End of https://www.gitignore.io/api/python,css,html,js,yarn
