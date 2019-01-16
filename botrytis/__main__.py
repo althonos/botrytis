@@ -7,8 +7,6 @@ Usage:
 Arguments:
     -p PORT, --port PORT        The port the server should listen to
                                 [default: 8080].
-    -s STATIC, --static STATIC  The location to the `static` folder
-                                [default: ./static]
 
 """
 
@@ -22,7 +20,7 @@ from .server import BotrytisWebsite
 
 
 args = docopt.docopt(__doc__)
-
+cwd = os.path.abspath(os.getcwd())
 
 cherrypy.quickstart(
     BotrytisWebsite(),
@@ -30,7 +28,11 @@ cherrypy.quickstart(
     {
         "/static": {
             "tools.staticdir.on": True,
-            "tools.staticdir.dir": os.path.abspath(args['--static']),
+            "tools.staticdir.dir": os.path.join(cwd, "ext")
         },
+        "/static/img": {
+            "tools.staticdir.on": True,
+            "tools.staticdir.dir": os.path.join(cwd, "static", "img")
+        }
     }
 )

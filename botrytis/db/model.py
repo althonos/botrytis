@@ -16,8 +16,10 @@ class Gene(typing.NamedTuple):
     name: str
     chromosome: int
     sequence: int
+    annotations: typing.Optional[typing.List['Annotation']]
 
     def to_seq_record(self):
+        # TODO: add annotations
         seq = Bio.Seq.Seq(self.sequence, alphabet=Bio.Alphabet.IUPAC.ambiguous_dna)
         return Bio.SeqRecord.SeqRecord(seq, self.locus, description=self.name)
 
@@ -32,6 +34,7 @@ class Annotation(typing.NamedTuple):
     stop: int
     score: float
     evalue: float
+    gene: typing.Optional['Gene']
 
 
 class Transcript(typing.NamedTuple):
