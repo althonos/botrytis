@@ -16,7 +16,21 @@ class BotrytisDB(object):
         cursor = sqlite3.connect(self.db).cursor()
         cursor.execute("SELECT * FROM gene WHERE locus=?", (locus,))
         row = cursor.fetchone()
-        return Gene(*row) if row is not None else None
+        if row is None:
+            return None
+        gene = Gene(*row, annotations=[])
+        cursor.execute("SELECT * FROM annotation WHERE locus=?", (locus,))
+        for row in cursor.fetchall():
+            gene.annotations.append(Annotation(*row, gene=gene))
+        return gene
+
+    def annotations(self, accession):
+        cursor = sqlite3.connect(self.db).cursor()
+        cursor.execute("SELECT * FROM annotation WHERE accession=? ORDER BY locus", (accession,))
+        rows = cursor.fetchall()
+        if not rows:
+            return None
+        return [Annotation(*row, gene=self.gene(row[0])) for row in rows]
 
     def transcript(self, locus):
         cursor = sqlite3.connect(self.db).cursor()

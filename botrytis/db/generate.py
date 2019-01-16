@@ -50,25 +50,25 @@ def generate_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
         for line in itertools.islice(f, 1, None):
             locus, _, _, length, start, stop, strand, name, chromosome, *_ = line.split('\t')
             seq = str(records_g[locus].seq)
-            genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(chromosome), seq))
+            genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(chromosome), seq, None))
 
     # Load annotations from the PFAM to genes mapping
     pfam = []
     with open(os.path.join(data_dir, "pfam_to_genes.txt")) as f:
         for line in itertools.islice(f, 1, None):
-            _, locus, contig, accession, name, description, start, stop, length, score, expected = line.strip().split('\t')
-            pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(expected)))
+            _, locus, contig, accession, name, description, start, stop, length, score, evalue = line.strip().split('\t')
+            pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(evalue), None))
 
     # Remove the old database
-    if os.path.exists("botrytis.db"):
-        os.remove("botrytis.db")
+    if os.path.exists(output):
+        os.remove(output)
 
     # Connect with SQLite3
-    with contextlib.closing(sqlite3.connect("botrytis.db")) as sql:
+    with contextlib.closing(sqlite3.connect(output)) as sql:
 
         # Create tables
         with pkg_resources.resource_stream(__name__, "generate.sql") as f:
-            statements = f.decode().read().split(';')
+            statements = f.read().decode().split(';')
             for statement in statements:
                 sql.execute(statement)
 
@@ -97,7 +97,7 @@ def generate_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
                 annot.start,
                 annot.stop,
                 annot.score,
-                annot.expected
+                annot.evalue
             ))
         sql.execute("COMMIT")
 
