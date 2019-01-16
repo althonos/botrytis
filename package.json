@@ -1,7 +1,10 @@
 {
   "license": "MIT",
   "dependencies": {
+    "@rnacentral/feature-viewer": "^1.1.1",
     "EBI-Icon-fonts": "^1.3.0",
-    "bootstrap": "^4.2.1"
+    "bootstrap": "^4.2.1",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.6"
   }
 }
