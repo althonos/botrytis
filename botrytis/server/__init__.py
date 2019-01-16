@@ -29,11 +29,29 @@ class Gene(BotrytisHandler):
 
     @cherrypy.expose
     def index(self, locus=None):
-        gene = locus if locus is None else self.db.gene(locus)
+        gene = None if locus is None else self.db.gene(locus)
         if gene is None:
-            raise cherrypy.HTTPError(404)
+            msg = f"No locus provided" if locus is None else f"No gene with locus {locus!r}"
+            raise cherrypy.HTTPError(404, msg)
         template = self.env.get_template('gene.html')
         return template.render(gene=gene)
+
+
+@cherrypy.popargs("accession")
+class Annotation(BotrytisHandler):
+
+    @cherrypy.expose
+    def index(self, accession=None):
+        annotations = None if accession is None else self.db.annotations(accession)
+        if annotations is None:
+            if accession is None:
+                msg = f"No accession provided"
+            else:
+                msg = f"No annotation with accession {accession!r}"
+            raise cherrypy.HTTPError(404, msg)
+        template = self.env.get_template("annotation.html")
+        return template.render(annotations=annotations)
+
 
 
 @cherrypy.popargs("locus")
@@ -73,6 +91,7 @@ class BotrytisWebsite(BotrytisHandler):
         self.env.filters['sentence'] = filters.sentence
 
         # --- Subfolder handlers ---
+        self.annotation = Annotation(self.db, self.env)
         self.gene = Gene(self.db, self.env)
         self.download = Download(self.db, self.env)
 
