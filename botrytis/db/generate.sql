@@ -27,6 +27,8 @@ CREATE TABLE Annotation(
     FOREIGN KEY (locus) REFERENCES Gene(locus)
 );
 
+CREATE INDEX Annotation_Locus ON Annotation(locus);
+
 CREATE TABLE Transcript(
     locus CHAR(10),
 
