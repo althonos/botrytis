@@ -1,10 +1,11 @@
 <meta charset="UTF-8">
 
 <head>
+{% block head %}
     {% include '_style.html' %}
     {% include '_icon.html' %}
     <title>The Botrytis Viewer - {{ annotations[0].accession }}</title>
-
+{% endblock %}
 </head>
 
 <body class="d-flex flex-column h-100">

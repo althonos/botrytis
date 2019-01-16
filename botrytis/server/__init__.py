@@ -38,7 +38,7 @@ class Gene(BotrytisHandler):
         if gene is None:
             msg = f"No locus provided" if locus is None else f"No gene with locus {locus!r}"
             raise cherrypy.HTTPError(404, msg)
-        template = self.env.get_template('gene.html')
+        template = self.env.get_template('gene/page.html')
         return template.render(gene=gene)
 
     @cherrypy.expose
@@ -47,7 +47,7 @@ class Gene(BotrytisHandler):
         """
         if locus is not None:
             return self.gene(locus)
-        template = self.env.get_template('geneindex.html')
+        template = self.env.get_template('gene/index.html')
         return template.render()
 
 
@@ -64,14 +64,14 @@ class Annotation(BotrytisHandler):
         if annotations is None:
             msg = f"No annotation with accession {accession!r}"
             raise cherrypy.HTTPError(404, msg)
-        template = self.env.get_template("annotation.html")
+        template = self.env.get_template("annotation/page.html")
         return template.render(annotations=annotations)
 
     @cherrypy.expose
     def index(self, accession=None):
         if accession is not None:
             return self.annotation(accession)
-        template = self.env.get_template("annotationindex.html")
+        template = self.env.get_template("annotation/index.html")
         return template.render()
 
 
