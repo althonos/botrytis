@@ -17,40 +17,62 @@ class BotrytisHandler(object):
     def __init__(self, db, env):
         self.db = db
         self.env = env
-        self._cp_config = {'error_page.404': self.error404}
+        self._cp_config = {
+            'error_page.404': self._cp_error,
+            'error_page.403': self._cp_error,
+            'error_page.500': self._cp_error,
+        }
 
-    def error404(self, traceback, message, status, version):
+    def _cp_error(self, traceback, message, status, version):
         template = self.env.get_template('error.html')
-        return template.render(message=message, status=status)
+        return template.render(message=message, status=status, traceback=traceback)
 
 
 @cherrypy.popargs("locus")
 class Gene(BotrytisHandler):
 
-    @cherrypy.expose
-    def index(self, locus=None):
-        gene = None if locus is None else self.db.gene(locus)
+    def gene(self, locus):
+        """Serve a page for a given gene.
+        """
+        gene = self.db.gene(locus)
         if gene is None:
             msg = f"No locus provided" if locus is None else f"No gene with locus {locus!r}"
             raise cherrypy.HTTPError(404, msg)
         template = self.env.get_template('gene.html')
         return template.render(gene=gene)
 
+    @cherrypy.expose
+    def index(self, locus=None):
+        """Serve a gene index.
+        """
+        if locus is not None:
+            return self.gene(locus)
+        template = self.env.get_template('geneindex.html')
+        return template.render()
+
+
+
+
+
+
 
 @cherrypy.popargs("accession")
 class Annotation(BotrytisHandler):
 
-    @cherrypy.expose
-    def index(self, accession=None):
-        annotations = None if accession is None else self.db.annotations(accession)
+    def annotation(self, accession):
+        annotations = self.db.annotations(accession)
         if annotations is None:
-            if accession is None:
-                msg = f"No accession provided"
-            else:
-                msg = f"No annotation with accession {accession!r}"
+            msg = f"No annotation with accession {accession!r}"
             raise cherrypy.HTTPError(404, msg)
         template = self.env.get_template("annotation.html")
         return template.render(annotations=annotations)
+
+    @cherrypy.expose
+    def index(self, accession=None):
+        if accession is not None:
+            return self.annotation(accession)
+        template = self.env.get_template("annotationindex.html")
+        return template.render()
 
 
 

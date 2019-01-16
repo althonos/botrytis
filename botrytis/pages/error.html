@@ -22,6 +22,11 @@
             <div class="row"><hr class="primary"/></div>
             <div class="row"><h1>{{ status }}</h1></div>
             <div class="row">{{ message | sentence }}</div>
+            {% if status.startswith('500') %}
+            <div class="row align-items-start bg-white col-8 rounded my-2">
+              <pre>{{ traceback }}</pre>
+            </div>
+            {% endif %}
           </div>
       </div>
     </div>
