@@ -68,11 +68,11 @@ class Annotation(BotrytisHandler):
         return template.render(annotations=annotations)
 
     @cherrypy.expose
-    def index(self, accession=None):
+    def index(self, accession=None, page=1):
         if accession is not None:
             return self.annotation(accession)
         template = self.env.get_template("annotation/index.html")
-        return template.render()
+        return template.render(page=page)
 
 
 
@@ -81,16 +81,26 @@ class Download(BotrytisHandler):
 
     @cherrypy.expose
     def gb(self, locus=None):
-        gene = locus if locus is None else self.db.gene(locus)
+        gene = None if locus is None else self.db.gene(locus)
         if gene is None:
             raise cherrypy.HTTPError(404)
+        return self._download(gene, 'gb', 'chemical/x-genbank', 'gb')
 
-        cherrypy.response.headers['Content-Type'] = 'chemical/x-genbank'
-        cherrypy.response.headers['Content-Disposition'] = f'attachment; filename={locus}.gb'
+    @cherrypy.expose
+    def fasta(self, locus=None):
+        gene = None if locus is None else self.db.gene(locus)
+        if gene is None:
+            raise cherrypy.HTTPError(404)
+        return self._download(gene, 'fasta', 'chemical/seq-na-fasta', 'fa')
 
+    def _download(self, gene, format, mimetype, extension):
+        cherrypy.response.headers.update({
+            'Content-Type': f'{mimetype}',
+            'Content-Disposition': f'attachment; filename={gene.locus}.{extension}'
+        })
         res = io.StringIO()
         record = gene.to_seq_record()
-        Bio.SeqIO.write(record, res, "gb")
+        Bio.SeqIO.write(record, res, format)
         return res.getvalue().encode()
 
 

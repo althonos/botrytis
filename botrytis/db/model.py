@@ -5,6 +5,7 @@ import typing
 import Bio.Alphabet.IUPAC
 import Bio.Seq
 import Bio.SeqRecord
+import Bio.SeqFeature
 
 
 class Gene(typing.NamedTuple):
@@ -19,9 +20,11 @@ class Gene(typing.NamedTuple):
     annotations: typing.Optional[typing.List['Annotation']]
 
     def to_seq_record(self):
-        # TODO: add annotations
         seq = Bio.Seq.Seq(self.sequence, alphabet=Bio.Alphabet.IUPAC.ambiguous_dna)
-        return Bio.SeqRecord.SeqRecord(seq, self.locus, description=self.name)
+        record = Bio.SeqRecord.SeqRecord(seq, self.locus, description=self.name)
+        record.annotations['topology'] = 'linear'
+        record.features = [a.to_seq_feature() for a in self.annotations or ()]
+        return record
 
 
 class Annotation(typing.NamedTuple):
@@ -35,6 +38,21 @@ class Annotation(typing.NamedTuple):
     score: float
     evalue: float
     gene: typing.Optional['Gene']
+
+    def to_seq_feature(self):
+        return Bio.SeqFeature.SeqFeature(
+            type="misc_feature",
+            strand=1,
+            qualifiers={
+                'label': self.name,
+                'note': f"{self.description} ({self.accession})",
+                'db_xref': f"PFAM:{self.accession}",
+            },
+            location=Bio.SeqFeature.FeatureLocation(
+                start=self.start - self.gene.start,
+                end=self.stop - self.gene.start,
+            )
+        )
 
 
 class Transcript(typing.NamedTuple):
