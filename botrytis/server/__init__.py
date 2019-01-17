@@ -40,7 +40,8 @@ class Gene(BotrytisHandler):
         "locus": "Locus",
         "start": "Start location",
         "stop": "End location",
-        "length": "Length"
+        "length": "Length",
+        "chromosome": "Chromosome",
     }
 
     def gene(self, locus):
@@ -131,6 +132,31 @@ class Download(BotrytisHandler):
         return res.getvalue().encode()
 
 
+@cherrypy.popargs("query")
+class Search(BotrytisHandler):
+
+    @cherrypy.expose
+    def index(self, query=None):
+        if query is None:
+            return "Nothing found"
+        query = query.strip()
+
+        # redirect to a gene if given a gene ID
+        gene = self.db.gene(query)
+        if gene is not None:
+            raise cherrypy.HTTPRedirect(f"/gene/{gene.locus}")
+
+        # redirect to an annotation if given an accession
+        annots = self.db.annotations(query)
+        if annots is not None:
+            raise cherrypy.HTTPRedirect(f"/annotation/{annots[0].accession}")
+
+        # default search result
+        return "Oopsie nothing found"
+
+
+
+
 class BotrytisWebsite(BotrytisHandler):
 
     def __init__(self):
@@ -151,6 +177,7 @@ class BotrytisWebsite(BotrytisHandler):
         self.annotation = Annotation(self.db, self.env)
         self.gene = Gene(self.db, self.env)
         self.download = Download(self.db, self.env)
+        self.search = Search(self.db, self.env)
 
     @cherrypy.expose
     def index(self):
