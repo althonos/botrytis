@@ -28,6 +28,7 @@ CREATE TABLE Annotation(
 );
 
 CREATE INDEX Annotation_Locus ON Annotation(locus);
+CREATE INDEX Annotation_Accession ON Annotation(accession);
 
 CREATE TABLE Transcript(
     locus CHAR(10),

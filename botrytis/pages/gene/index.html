@@ -8,14 +8,145 @@
 {% endblock %}
 </head>
 
+
+
 <body class="d-flex flex-column h-100">
 {% block body %}
 
   {% include 'navbar.html' %}
 
+  <nav class="nav nav-underline small my-md-2">
+    <span class="nav-link">Genes</span>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown01">
+        {% for key, name in sort_keys.items() %}
+          <a class="dropdown-item small" href="/gene/?sort={{ key }}&page=1">{{ name }}</a>
+        {% endfor %}
+      </div>
+    </li>
+  </nav>
+  <!-- </div> -->
+
   <main role="main" class="flex-shrink">
     <div class="jumbotron">
-      {{ zob }}
+      <div class="container">
+
+        {% if genes %}
+          <!-- header -->
+          <div class="row text-primary">
+            <div class="col-3 col-lg-7 d-block d-lg-none">Locus</div>
+            <div class="col-3 col-lg-7 d-none d-lg-block">Locus - Name</div>
+            <div class="col-3 col-lg-2">Chromosome</div>
+            <div class="col-2 col-lg-1">Start</div>
+            <div class="col-2 col-lg-1">Stop</div>
+            <div class="col-2 col-lg-1">Length</div>
+          </div>
+          <!-- items -->
+          {% for gene in genes %}
+          <a href="/gene/{{ gene.locus }}">
+            <div class="row my-3 p-2 bg-white rounded shadow-sm text-secondary">
+              <!-- column on large viewport -->
+              <div class="col-3 col-lg-7 d-none d-lg-block">
+                <span class="text-primary">{{ gene.locus }}</span> - {{ gene.name }}
+              </div>
+              <!-- same column on narrow viewport -->
+              <div class="col-3 col-lg-7 d-block d-lg-none">
+                <span class="text-primary">{{ gene.locus }}</span>
+              </div>
+              <div class="col-3 col-lg-2">{{ gene.chromosome }}</div>
+              <div class="col-2 col-lg-1">{{ gene.start }}</div>
+              <div class="col-2 col-lg-1">{{ gene.stop }}</div>
+              <div class="col-2 col-lg-1">{{ gene.length }}</div>
+            </div>
+          </a>
+          {% endfor %}
+        {% else %}
+          <i>No genes found.</i>
+        {% endif %}
+
+        <!-- pagination -->
+        <nav aria-label="...">
+          <ul class="pagination">
+
+            <!-- button macro -->
+            {% macro quickbutton(offset, icon) %}
+              {% if (page + offset > 0) and (page + offset < total + 1) %}
+                <li class="page-item">
+                  <a class="page-link icon icon-common {{icon | safe}}" href="/gene/?page={{ page + offset}}&sort={{ sort }}"></a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <a class="page-link  icon icon-common {{ icon | safe }}" href="#"></a>
+                </li>
+              {% endif %}
+            {% endmacro %}
+
+            <!-- previous -->
+            {{ quickbutton(-100, "icon-fast-backward")}}
+            {{ quickbutton(-10, "icon-step-backward")}}
+            {{ quickbutton(-1, "icon-caret-left")}}
+
+            <!-- page buttons -->
+            {% if page < 5 or page > total - 4 %}
+              {% for index in range(1, 6) %}
+                {% if index == page %}
+                  <li class="page-item active">
+                {% else %}
+                  <li class="page-item">
+                {% endif %}
+                    <a class="page-link" href="/gene/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                  </li>
+              {%endfor%}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">...</a>
+              </li>
+              {% for index in range(total - 4, total+1) %}
+                {% if index == page %}
+                  <li class="page-item active">
+                {% else %}
+                  <li class="page-item">
+                {% endif %}
+                    <a class="page-link" href="/gene/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                  </li>
+              {%endfor%}
+            {% else %}
+              {% for index in range(1, 3) %}
+                <li class="page-item">
+                  <a class="page-link" href="/gene/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                </li>
+              {%endfor%}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">...</a>
+              </li>
+              {% for index in range(page-2, page+3) %}
+                {% if index == page %}
+                  <li class="page-item active">
+                {% else %}
+                  <li class="page-item">
+                {% endif %}
+                    <a class="page-link" href="/gene/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                  </li>
+              {%endfor%}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">...</a>
+              </li>
+              {% for index in range(total - 1, total+1) %}
+                <li class="page-item">
+                  <a class="page-link" href="/gene/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                </li>
+              {%endfor%}
+            {% endif %}
+
+            <!-- next -->
+            {{ quickbutton(1, "icon-caret-right")}}
+            {{ quickbutton(10, "icon-step-forward")}}
+            {{ quickbutton(100, "icon-fast-forward")}}
+
+          </ul>
+        </nav>
+
+      </div>
     </div>
   </main>
 

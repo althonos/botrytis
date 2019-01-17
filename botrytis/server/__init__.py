@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import io
+import math
 
 import Bio.Seq
 import Bio.SeqRecord
@@ -18,6 +19,7 @@ class BotrytisHandler(object):
         self.db = db
         self.env = env
         self._cp_config = {
+            'error_page.400': self._cp_error,
             'error_page.404': self._cp_error,
             'error_page.403': self._cp_error,
             'error_page.500': self._cp_error,
@@ -31,6 +33,15 @@ class BotrytisHandler(object):
 @cherrypy.popargs("locus")
 class Gene(BotrytisHandler):
 
+    PAGESIZE = 10
+
+    SORT_KEYS = {
+        "locus": "Locus",
+        "start": "Start location",
+        "stop": "End location",
+        "length": "Length"
+    }
+
     def gene(self, locus):
         """Serve a page for a given gene.
         """
@@ -42,13 +53,26 @@ class Gene(BotrytisHandler):
         return template.render(gene=gene)
 
     @cherrypy.expose
-    def index(self, locus=None):
+    def index(self, locus=None, sort="locus", page=1):
         """Serve a gene index.
         """
         if locus is not None:
             return self.gene(locus)
+        if sort not in self.SORT_KEYS:
+            raise cherrypy.HTTPError(400, f"invalid parameter: sort={sort!r}")
+        try:
+            page = int(page)
+        except ValueError:
+            raise cherrypy.HTTPError(400, f"invalid parameter: page={sort!r}")
+        genes, total = self.db.genes(sort=sort, page=page, pagesize=self.PAGESIZE)
         template = self.env.get_template('gene/index.html')
-        return template.render()
+        return template.render(
+            genes=genes,
+            page=page,
+            sort=sort,
+            total=math.ceil(total/self.PAGESIZE),
+            sort_keys=self.SORT_KEYS
+        )
 
 
 

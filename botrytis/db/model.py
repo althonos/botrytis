@@ -44,8 +44,8 @@ class Annotation(typing.NamedTuple):
             type="misc_feature",
             strand=1,
             qualifiers={
-                'label': self.name,
-                'note': f"{self.description} ({self.accession})",
+                'label': self.accession,
+                'note': [self.name, self.description],
                 'db_xref': f"PFAM:{self.accession}",
             },
             location=Bio.SeqFeature.FeatureLocation(
