@@ -1,0 +1,107 @@
+{# The base page, including;
+ # * an extendable header with:
+ #   - usual meta attributes (author, charset, viewport, )
+ #   - links to Bootrasp and EBI CSS
+ #   - the Botrytis icon
+ # * the navigation bar; set the active tab by setting the `tab_active` attribute
+ #   within the Jinja2 template
+ # * the main block wrapped in a <main> HTML block
+ # * the extendable footer with copyright notice
+ # * an extendable script block with JQuery, Popper.js and Bootstrap setup
+ #}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  {% block _head %}
+      <!-- meta -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="author" content="Martin Larralde">
+      <!-- styling -->
+      <link href="/static/EBI-Icon-fonts/fonts.css" rel="stylesheet" crossorigin="anonymous">
+      <link href="/static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+      <!-- icon -->
+      <link rel="icon" type="image/png" href="/static/img/logo.png"/>
+      {% block head %}
+      {% endblock %}
+  {% endblock %}
+  </head>
+
+  <body class="d-flex flex-column h-100">
+  {% block body %}
+
+    <!-- navigation -->
+    {% block _navbar %}
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <!-- Move down content because we have a fixed navbar that is 3.5rem tall -->
+        <style>body {padding-top: 3.5rem;}</style>
+        <!-- main title & icon ? -->
+        <a class="navbar-brand" href="/">The Botrytis Viewer</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- navbar items -->
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          <!-- nav items -->
+          <ul class="navbar-nav mr-auto">
+            <!-- navbar links -->
+            {% for href, tab_name in [("/gene/", "Genes"), ("/annotation/", "Annotations")] %}
+              <li class="nav-item {% if tab_name==tab_active %}active{% endif %}">
+                <a class="nav-link" href="{{ href }}">{{ tab_name }}</a>
+              </li>
+            {% endfor %}
+            <!-- dropdown menu -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BLAST</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="#">BLASTn</a>
+                <a class="dropdown-item" href="#">BLASTp</a>
+              </div>
+            </li>
+          </ul>
+          <!-- search bar -->
+          <form class="form-inline my-2 my-lg-0" action="/search/">
+            <input name="query" class="form-control mr-sm-2" type="text" placeholder="e.g. BC1G_00008, tRNA, ..." aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Go!</button>
+          </form>
+        </div>
+      </nav>
+    {% endblock %}
+
+    <!-- content -->
+    <main role="main" class="flex-shrink">
+      {% block main %}
+      {% endblock %}
+    </main>
+
+    <!-- footer -->
+    {% block _footer %}
+      <footer class="footer mt-auto py-3">
+        <div class="container">
+          <div class="row">
+            <span class="text-muted">© 2018-2019, Martin Larralde</span>
+          </div>
+          <div class="row">
+            <span class="text-muted">© Images courtesy of <a href="www.instagram.com/mushroommovie/">@mushroommovies</a>
+          </div>
+          {% block footer %}
+          {% endblock %}
+        </div>
+      </footer>
+    {% endblock %}
+
+    <!-- scripts -->
+    {% block _scripts %}
+      <script src="/static/popper.js/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"></script>
+      <script src="/static/jquery/dist/jquery.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"></script>
+      <script src="/static/bootstrap/dist/js/bootstrap.bundle.min.js" integrity="sha384-zDnhMsjVZfS3hiP7oCBRmfjkQC4fzxVxFhBx8Hkz2aZX8gEvA/jsP3eXRCvzTofP" crossorigin="anonymous"></script>
+      {% block scripts %}
+      {% endblock %}
+    {% endblock %}
+
+  {% endblock %}
+  </body>
+
+</html>

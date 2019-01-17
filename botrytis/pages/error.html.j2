@@ -1,0 +1,30 @@
+{# The error page, rendered on HTTP errors #}
+{% extends 'base.html.j2' %}
+
+<!-- header -->
+{% block head %}
+  <title>The Botrytis Viewer - {{ status }}</title>
+{% endblock %}
+
+
+<!-- content -->
+{% block main %}
+  <div class="jumbotron">
+    <div class="row">
+        <div class="col-3">
+          <img class="img-fluid" src="/static/img/error.gif"/>
+        </div>
+        <div class="col md-auto">
+          <div class="row"><h3>This is definitely an error...</h3></div>
+          <div class="row"><hr class="primary"/></div>
+          <div class="row"><h1>{{ status }}</h1></div>
+          <div class="row">{{ message | sentence }}</div>
+          {% if status.startswith('500') %}
+          <div class="row align-items-start bg-white col-8 rounded my-2">
+            <pre>{{ traceback }}</pre>
+          </div>
+          {% endif %}
+        </div>
+    </div>
+  </div>
+{% endblock %}

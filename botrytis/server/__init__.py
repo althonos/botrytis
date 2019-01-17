@@ -27,7 +27,7 @@ class BotrytisHandler(object):
         }
 
     def _cp_error(self, traceback, message, status, version):
-        template = self.env.get_template('error.html')
+        template = self.env.get_template('error.html.j2')
         return template.render(message=message, status=status, traceback=traceback)
 
 
@@ -51,7 +51,7 @@ class Gene(BotrytisHandler):
         if gene is None:
             msg = f"No locus provided" if locus is None else f"No gene with locus {locus!r}"
             raise cherrypy.HTTPError(404, msg)
-        template = self.env.get_template('gene/page.html')
+        template = self.env.get_template('gene/page.html.j2')
         return template.render(gene=gene)
 
     @cherrypy.expose
@@ -74,7 +74,7 @@ class Gene(BotrytisHandler):
             pagesize=self.PAGESIZE,
             ascending=order=="asc",
         )
-        template = self.env.get_template('gene/index.html')
+        template = self.env.get_template('gene/index.html.j2')
         return template.render(
             genes=genes,
             page=page,
@@ -93,14 +93,14 @@ class Annotation(BotrytisHandler):
         if annotations is None:
             msg = f"No annotation with accession {accession!r}"
             raise cherrypy.HTTPError(404, msg)
-        template = self.env.get_template("annotation/page.html")
+        template = self.env.get_template("annotation/page.html.j2")
         return template.render(annotations=annotations)
 
     @cherrypy.expose
     def index(self, accession=None, page=1):
         if accession is not None:
             return self.annotation(accession)
-        template = self.env.get_template("annotation/index.html")
+        template = self.env.get_template("annotation/index.html.j2")
         return template.render(page=page)
 
 
@@ -181,5 +181,5 @@ class BotrytisWebsite(BotrytisHandler):
 
     @cherrypy.expose
     def index(self):
-        template = self.env.get_template("splash/index.html")
+        template = self.env.get_template("splash.html.j2")
         return template.render(background=random.randint(1, 3))
