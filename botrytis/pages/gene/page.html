@@ -13,9 +13,11 @@
   <body class="d-flex flex-column h-100">
   {% block body %}
 
+    <!-- navigation -->
     {% import 'navbar.html' as navbar %}
     {{ navbar.navbar(active="Genes") }}
 
+    <!-- content -->
     <main role="main" class="flex-shrink">
       <div class="jumbotron">
         <div class="container">
@@ -115,6 +117,8 @@
       </div>
     </main>
 
+
+    <!-- footer and scripts -->
     {% include 'footer.html' %}
     {% include '_scripts.html' %}
 

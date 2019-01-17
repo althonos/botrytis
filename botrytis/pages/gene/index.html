@@ -13,26 +13,16 @@
   <body class="d-flex flex-column h-100">
   {% block body %}
 
+    <!-- navigation -->
     {% import 'navbar.html' as navbar %}
     {{ navbar.navbar(active="Genes") }}
 
-    <!-- <nav class="nav nav-underline small my-md-2">
-      <span class="nav-link">Genes</span>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          {% for key, name in sort_keys.items() %}
-            <a class="dropdown-item small" href="/gene/?sort={{ key }}&page=1">{{ name }}</a>
-          {% endfor %}
-        </div>
-      </li>
-    </nav> -->
-    <!-- </div> -->
-
+    <!-- content -->
     <main role="main" class="flex-shrink">
       <div class="jumbotron">
         <div class="container">
 
+          <!-- search results -->
           {% if genes %}
             <!-- table header -->
             <div class="row text-primary">
@@ -171,6 +161,7 @@
       </div>
     </main>
 
+    <!-- footer and scripts -->
     {% include 'footer.html' %}
     {% include '_scripts.html' %}
 

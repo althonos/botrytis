@@ -12,11 +12,13 @@
 
 
   <body>
-    <!-- Navigation -->
+  {% block body %}
 
+    <!-- navigation -->
     {% import 'navbar.html' as navbar %}
     {{ navbar.navbar(active=None) }}
 
+    <!-- content -->
     <div class="jumbotron bg-secondary text-white text-center">
       <div class="container">
         <img class="img-fluid mb-5" src="/static/img/splash.gif" alt="">
@@ -25,7 +27,11 @@
         <i class="h6">A website that makes you want to look at mold</i>
       </div>
     </div>
+
+    <!-- footer and scripts -->
     {% include 'footer.html' %}
     {% include '_scripts.html' %}
+
+  {% endblock %}
   </body>
 </html>
