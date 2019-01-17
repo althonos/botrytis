@@ -1,3 +1,4 @@
+-- Gene ------------------------------------------------------------------------
 CREATE TABLE Gene(
     locus      CHAR(10),
     length     INTEGER CHECK (length >= 0),
@@ -13,6 +14,7 @@ CREATE TABLE Gene(
     PRIMARY KEY (locus)
 );
 
+-- Domain ----------------------------------------------------------------------
 CREATE TABLE Domain(
     accession VARCHAR(10),
     name TEXT,
@@ -21,7 +23,7 @@ CREATE TABLE Domain(
     PRIMARY KEY (accession)
 );
 
-
+-- Annotation ------------------------------------------------------------------
 CREATE TABLE Annotation(
     -- annotated gene
     locus CHAR(10),
@@ -39,24 +41,10 @@ CREATE TABLE Annotation(
     FOREIGN KEY (accession) REFERENCES Annotation(accession)
 );
 
+CREATE INDEX Annotation_Locus ON Annotation(locus);
+CREATE INDEX Annotation_Accession ON Annotation(accession);
 
--- CREATE TABLE Annotation(
---     locus CHAR(10),
---     accession VARCHAR(10),
---     name TEXT,
---     description TEXT,
---     length INTEGER CHECK (length >= 0),
---     start INTEGER CHECK (start >= 0),
---     stop INTEGER CHECK (stop >= start),
---     score DOUBLE,
---     expected DOUBLE,
---
---     FOREIGN KEY (locus) REFERENCES Gene(locus)
--- );
-
--- CREATE INDEX Annotation_Locus ON Annotation(locus);
--- CREATE INDEX Annotation_Accession ON Annotation(accession);
-
+-- Transcripts -----------------------------------------------------------------
 CREATE TABLE Transcript(
     locus CHAR(10),
     -- protein sequence
