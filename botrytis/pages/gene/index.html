@@ -13,9 +13,10 @@
   <body class="d-flex flex-column h-100">
   {% block body %}
 
-    {% include 'navbar.html' %}
+    {% import 'navbar.html' as navbar %}
+    {{ navbar.navbar(active="Genes") }}
 
-    <nav class="nav nav-underline small my-md-2">
+    <!-- <nav class="nav nav-underline small my-md-2">
       <span class="nav-link">Genes</span>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort</a>
@@ -25,7 +26,7 @@
           {% endfor %}
         </div>
       </li>
-    </nav>
+    </nav> -->
     <!-- </div> -->
 
     <main role="main" class="flex-shrink">
@@ -33,16 +34,32 @@
         <div class="container">
 
           {% if genes %}
-            <!-- header -->
+            <!-- table header -->
             <div class="row text-primary">
-              <div class="col-3 col-lg-7 d-block d-lg-none">Locus</div>
-              <div class="col-3 col-lg-7 d-none d-lg-block">Locus - Name</div>
-              <div class="col-3 col-lg-2">Chromosome</div>
-              <div class="col-2 col-lg-1">Start</div>
-              <div class="col-2 col-lg-1">Stop</div>
-              <div class="col-2 col-lg-1">Length</div>
+              {% for name, id, cls in [
+                  ("Locus", "locus", "col-3 col-lg-7 d-block d-lg-none"),
+                  ("Locus - Name", "locus", "col-3 col-lg-7 d-none d-lg-block"),
+                  ("Chromosome", "chromosome", "col-3 col-lg-2"),
+                  ("Start", "start", "col-2 col-lg-1"),
+                  ("Stop", "stop", "col-2 col-lg-1"),
+                  ("Length", "length", "col-2 col-lg-1")]
+               %}
+               <div class="{{ cls | safe }}">
+                  {% if sort==id %}
+                    {% if ascending %}
+                      <a href="/gene/?sort={{ id }}&page=1&order=desc">{{ name }}</a>
+                      <i class="icon icon-common icon-caret-down"></i>
+                    {% else %}
+                      <a href="/gene/?sort={{ id }}&page=1&order=asc">{{ name }}</a>
+                      <i class="icon icon-common icon-caret-up"></i>
+                    {% endif %}
+                  {% else %}
+                    <a href="/gene/?sort={{ id }}&page=1">{{ name }}</a>
+                  {% endif %}
+               </div>
+               {% endfor %}
             </div>
-            <!-- items -->
+            <!-- table rows -->
             {% for gene in genes %}
             <a href="/gene/{{ gene.locus }}">
               <div class="row my-3 p-2 bg-white rounded shadow-sm text-secondary">
@@ -62,7 +79,11 @@
             </a>
             {% endfor %}
           {% else %}
-            <i>No genes found.</i>
+            <div class="row text-muted my-0 p-3">
+              <div class="col-3">
+                <i>No genes found.</i>
+              </div>
+            </div>
           {% endif %}
 
           <!-- pagination -->

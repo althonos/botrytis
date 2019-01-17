@@ -13,7 +13,8 @@
   <body class="d-flex flex-column h-100">
   {% block body %}
 
-    {% include 'navbar.html' %}
+    {% import 'navbar.html' as navbar %}
+    {{ navbar.navbar(active="Genes") }}
 
     <main role="main" class="flex-shrink">
       <div class="jumbotron">
@@ -75,7 +76,7 @@
               {{ download_button("FASTA", "fasta") }}
               {{ download_button("GenBank", "gb") }}
             </div>
-            <!-- DEBUG-- <p id="width"></p> -->
+            <!-- DEBUG <p id="width"></p> -->
             <div class="container">
               <div class="row align-items-start">
                 <div class="col-2 col-lg-1" id="sequence-indexes"></div>
@@ -109,8 +110,6 @@
               {% endfor %}
             </div>
           </div>
-
-
 
         </div>
       </div>

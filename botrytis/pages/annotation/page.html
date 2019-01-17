@@ -13,7 +13,8 @@
   <body class="d-flex flex-column h-100">
   {% block body %}
 
-    {% include 'navbar.html' %}
+    {% import 'navbar.html' as navbar %}
+    {{ navbar.navbar(active="Annotations") }}
 
     <main role="main" class="flex-shrink">
       <div class="jumbotron">
@@ -82,8 +83,6 @@
               {% endfor %}
             </div>
           </div>
-
-
 
         </div>
       </div>
