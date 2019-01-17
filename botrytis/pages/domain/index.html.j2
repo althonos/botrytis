@@ -1,4 +1,4 @@
-{# The page to display information about all annotations #}
+{# The page to display information about all domains #}
 {% extends 'base.html.j2' %}
 {% set tab_active="Domains" %}
 
@@ -10,6 +10,138 @@
 <!-- content -->
 {% block main %}
   <div class="jumbotron">
-    <p>Page: {{ page }}</p>
+    <div class="container">
+
+      <!-- search results -->
+      {% if domains %}
+        <!-- table header -->
+        <div class="row text-primary">
+          {% for name, id, cls in [
+              ("Accession", "accession", "col-4 col-lg-2"),
+              ("Name", "name", "col-4 col-lg-4"),
+              ("Occurrences", "count", "col-4 col-lg-2"),
+             ]
+           %}
+           <div class="{{ cls | safe }}">
+              {% if sort==id %}
+                {% if ascending %}
+                  <a href="/domain/?sort={{ id }}&page=1&order=desc">{{ name }}</a>
+                  <i class="icon icon-common icon-caret-down"></i>
+                {% else %}
+                  <a href="/domain/?sort={{ id }}&page=1&order=asc">{{ name }}</a>
+                  <i class="icon icon-common icon-caret-up"></i>
+                {% endif %}
+              {% else %}
+                <a href="/domain/?sort={{ id }}&page=1">{{ name }}</a>
+              {% endif %}
+           </div>
+           {% endfor %}
+        </div>
+        <!-- table rows -->
+        {% for domain in domains %}
+        <a href="/domain/{{ domain.accession }}">
+          <div class="row my-3 p-2 bg-white rounded shadow-sm text-secondary">
+            <div class="col-4 col-lg-2">
+              <span class="text-primary">{{ domain.accession }}</span>
+            </div>
+            <div class="col-4 col-lg-4">
+              <span>{{ domain.name }}</span>
+            </div>
+            <div class="col-4 col-lg-2">
+              <span>{{ domain.annotations | length }}</span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="row text-muted my-0 p-3">
+          <div class="col-3">
+            <i>No domains found.</i>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- pagination -->
+      <nav aria-label="...">
+        <ul class="pagination">
+
+          <!-- button macro -->
+          {% macro quickbutton(offset, icon) %}
+            {% if (page + offset > 0) and (page + offset < total + 1) %}
+              <li class="page-item">
+                <a class="page-link icon icon-common {{icon | safe}}" href="/domain/?page={{ page + offset}}&sort={{ sort }}"></a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <a class="page-link  icon icon-common {{ icon | safe }}" href="#"></a>
+              </li>
+            {% endif %}
+          {% endmacro %}
+
+          <!-- previous -->
+          {{ quickbutton(-100, "icon-fast-backward")}}
+          {{ quickbutton(-10, "icon-step-backward")}}
+          {{ quickbutton(-1, "icon-caret-left")}}
+
+          <!-- page buttons -->
+          {% if page < 5 or page > total - 4 %}
+            {% for index in range(1, 6) %}
+              {% if index == page %}
+                <li class="page-item active">
+              {% else %}
+                <li class="page-item">
+              {% endif %}
+                  <a class="page-link" href="/domain/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                </li>
+            {%endfor%}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">...</a>
+            </li>
+            {% for index in range(total - 4, total+1) %}
+              {% if index == page %}
+                <li class="page-item active">
+              {% else %}
+                <li class="page-item">
+              {% endif %}
+                  <a class="page-link" href="/domain/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                </li>
+            {%endfor%}
+          {% else %}
+            {% for index in range(1, 3) %}
+              <li class="page-item">
+                <a class="page-link" href="/domain/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+              </li>
+            {%endfor%}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">...</a>
+            </li>
+            {% for index in range(page-2, page+3) %}
+              {% if index == page %}
+                <li class="page-item active">
+              {% else %}
+                <li class="page-item">
+              {% endif %}
+                  <a class="page-link" href="/domain/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+                </li>
+            {%endfor%}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">...</a>
+            </li>
+            {% for index in range(total - 1, total+1) %}
+              <li class="page-item">
+                <a class="page-link" href="/domain/?page={{ index }}&sort={{ sort }}">{{ index }}</a>
+              </li>
+            {%endfor%}
+          {% endif %}
+
+          <!-- next -->
+          {{ quickbutton(1, "icon-caret-right")}}
+          {{ quickbutton(10, "icon-step-forward")}}
+          {{ quickbutton(100, "icon-fast-forward")}}
+
+        </ul>
+      </nav>
+
+    </div>
   </div>
 {% endblock %}

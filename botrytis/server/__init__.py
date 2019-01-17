@@ -18,6 +18,9 @@ from . import filters
 
 class BotrytisHandler(object):
 
+    PAGESIZE = 10
+    SORT_KEYS = {}
+
     def __init__(self, db, env):
         self.db = db
         self.env = env
@@ -32,11 +35,20 @@ class BotrytisHandler(object):
         template = self.env.get_template('error.html.j2')
         return template.render(message=message, status=status, traceback=traceback)
 
+    def _validate_parameters(self, sort=None, page=None, order=None):
+        if sort is not None and sort not in self.SORT_KEYS:
+            raise cherrypy.HTTPError(400, f"invalid parameter: sort={sort!r}")
+        if page is not None:
+            try:
+                page = int(page)
+            except ValueError:
+                raise cherrypy.HTTPError(400, f"invalid parameter: page={sort!r}")
+        if order is not None and order not in {"asc", "desc"}:
+            raise cherrypy.HTTPError(400, f"invalid parameter: order={order!r}")
+
 
 @cherrypy.popargs("locus")
 class Gene(BotrytisHandler):
-
-    PAGESIZE = 10
 
     SORT_KEYS = {
         "locus": "Locus",
@@ -64,24 +76,17 @@ class Gene(BotrytisHandler):
         """
         if locus is not None:
             return self.gene(locus)
-        if sort not in self.SORT_KEYS:
-            raise cherrypy.HTTPError(400, f"invalid parameter: sort={sort!r}")
-        if order not in {"asc", "desc"}:
-            raise cherrypy.HTTPError(400, f"invalid parameter: order={order!r}")
-        try:
-            page = int(page)
-        except ValueError:
-            raise cherrypy.HTTPError(400, f"invalid parameter: page={sort!r}")
+        self._validate_parameters(page=page, sort=sort, order=order)
         genes, total = self.db.genes(
             sort=sort,
-            page=page,
+            page=int(page),
             pagesize=self.PAGESIZE,
             ascending=order=="asc",
         )
         template = self.env.get_template('gene/index.html.j2')
         return template.render(
             genes=genes,
-            page=page,
+            page=int(page),
             sort=sort,
             ascending=order=="asc",
             total=math.ceil(total/self.PAGESIZE),
@@ -91,6 +96,12 @@ class Gene(BotrytisHandler):
 
 @cherrypy.popargs("accession")
 class Domain(BotrytisHandler):
+
+    SORT_KEYS = {
+        "accession": "Accession",
+        "name": "Name",
+        "count": "Occurrences",
+    }
 
     def domain(self, accession):
         domain = self.db.domain(accession)
@@ -103,11 +114,26 @@ class Domain(BotrytisHandler):
         return template.render(domain=domain)
 
     @cherrypy.expose
-    def index(self, accession=None, page=1):
+    def index(self, accession=None, page=1, sort="accession", order="asc"):
         if accession is not None:
             return self.domain(accession)
-        template = self.env.get_template("domain/index.html.j2")
-        return template.render(page=page)
+        self._validate_parameters(page=page, sort=sort, order=order)
+        domains, total = self.db.domains(
+            sort=sort,
+            page=int(page),
+            pagesize=self.PAGESIZE,
+            ascending=order=="asc",
+        )
+        domains = [d.with_annotations(self.db.annotations(domain=d)) for d in domains]
+        template = self.env.get_template('domain/index.html.j2')
+        return template.render(
+            domains=domains,
+            page=int(page),
+            sort=sort,
+            ascending=order=="asc",
+            total=math.ceil(total/self.PAGESIZE),
+            sort_keys=self.SORT_KEYS
+        )
 
 
 @cherrypy.popargs("locus")

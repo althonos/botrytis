@@ -66,7 +66,7 @@ class BotrytisDB(object):
             for row in iter(cursor.fetchone, None)
         ]
 
-    def annotations(self, gene=None, domain=None):
+    def annotations(self, *, gene=None, domain=None):
         cursor = sqlite3.connect(self.db).cursor()
         if gene is None and domain is None:
             raise ValueError("give either a gene or a domain")
@@ -110,6 +110,38 @@ class BotrytisDB(object):
             return None
         domain = Domain(*row, annotations=None)
         return domain
+
+    def domains(self, sort="accession", page=1, pagesize=10, ascending=True):
+        cursor = sqlite3.connect(self.db).cursor()
+        if not isinstance(page, int) or not isinstance(pagesize, int):
+            raise TypeError("page and pagesize must be integers")
+        if sort not in self._columns('Domain') and sort != "count":
+            raise ValueError(f"unexpected sort key: {sort!r}")
+
+        if sort == "count":
+            cursor.execute(
+                f"""
+                  SELECT a.accession
+                    FROM Domain d, Annotation a
+                   WHERE a.accession=d.accession
+                GROUP BY a.accession
+                ORDER BY count(*) {"ASC" if ascending else "DESC"}
+                   LIMIT {pagesize} OFFSET {(page-1)*pagesize}
+                """
+            )
+        else:
+            cursor.execute(
+                f"""
+                  SELECT accession
+                    FROM Domain
+                ORDER BY {sort} {"ASC" if ascending else "DESC"}
+                   LIMIT {pagesize} OFFSET {(page-1)*pagesize}
+                """
+            )
+
+        domains = [self.domain(*row) for row in iter(cursor.fetchone, None)]
+        total, *_ = cursor.execute("SELECT COUNT(*) FROM Gene").fetchone()
+        return (domains, total)
 
     def transcript(self, locus):
         cursor = sqlite3.connect(self.db).cursor()
