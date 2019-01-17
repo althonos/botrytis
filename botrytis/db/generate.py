@@ -25,7 +25,7 @@ _DATA_DIRECTORY = os.path.relpath(
 )
 
 
-def generate_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
+def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
 
     def load_indexed(filename):
         return {
@@ -53,11 +53,15 @@ def generate_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
             genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(chromosome), seq, None))
 
     # Load annotations from the PFAM to genes mapping
+    index = set()
     pfam = []
     with open(os.path.join(data_dir, "pfam_to_genes.txt")) as f:
         for line in itertools.islice(f, 1, None):
             _, locus, contig, accession, name, description, start, stop, length, score, evalue = line.strip().split('\t')
-            pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(evalue), None))
+            # remove duplicate annotations (indentical annotations in the same place with different scores)
+            if (accession, start, stop) not in index:
+                index.add((accession, start, stop))
+                pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(evalue), None))
 
     # Remove the old database
     if os.path.exists(output):
@@ -114,7 +118,7 @@ def generate_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
 
 if __name__ == "__main__":
     try:
-        generate_db()
+        generate_sql_db()
     except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(1)
