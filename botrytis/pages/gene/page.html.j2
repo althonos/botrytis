@@ -80,8 +80,8 @@
           {% for annotation in gene.annotations %}
           <div class="media text-muted pt-3">
             <div class="media-body pb-2 mb-0 small lh-125 border-bottom">
-              <a class="text-secondary d-block" href="/annotation/{{ annotation.accession }}">
-                <strong class="text-gray-dark">{{ annotation.accession }} - <i>{{ annotation.name }}</i></strong>
+              <a class="text-secondary d-block" href="/domain/{{ annotation.domain.accession }}">
+                <strong class="text-gray-dark">{{ annotation.domain.accession }} - <i>{{ annotation.domain.name }}</i></strong>
               </a>
               <div class="row">
                 <div class="col-2">Start: {{ annotation.start }}</div>

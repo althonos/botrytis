@@ -88,21 +88,21 @@ class Gene(BotrytisHandler):
 
 
 @cherrypy.popargs("accession")
-class Annotation(BotrytisHandler):
+class Domain(BotrytisHandler):
 
-    def annotation(self, accession):
-        annotations = self.db.annotations(accession)
-        if annotations is None:
-            msg = f"No annotation with accession {accession!r}"
+    def domain(self, accession):
+        domain = self.db.domain(accession)
+        if domain is None:
+            msg = f"No domain with accession {accession!r}"
             raise cherrypy.HTTPError(404, msg)
-        template = self.env.get_template("annotation/page.html.j2")
-        return template.render(annotations=annotations)
+        template = self.env.get_template("domain/page.html.j2")
+        return template.render(domain=domain)
 
     @cherrypy.expose
     def index(self, accession=None, page=1):
         if accession is not None:
-            return self.annotation(accession)
-        template = self.env.get_template("annotation/index.html.j2")
+            return self.domain(accession)
+        template = self.env.get_template("domain/index.html.j2")
         return template.render(page=page)
 
 
@@ -149,9 +149,9 @@ class Search(BotrytisHandler):
             raise cherrypy.HTTPRedirect(f"/gene/{gene.locus}")
 
         # redirect to an annotation if given an accession
-        annots = self.db.annotations(query)
-        if annots is not None:
-            raise cherrypy.HTTPRedirect(f"/annotation/{annots[0].accession}")
+        domain = self.db.domain(query)
+        if domain is not None:
+            raise cherrypy.HTTPRedirect(f"/domain/{domain.accession}")
 
         # default search result
         return "Oopsie nothing found"
@@ -186,7 +186,7 @@ class BotrytisWebsite(BotrytisHandler):
         self.env.filters['sentence'] = filters.sentence
 
         # --- Subfolder handlers ---
-        self.annotation = Annotation(self.db, self.env)
+        self.domain = Domain(self.db, self.env)
         self.gene = Gene(self.db, self.env)
         self.download = Download(self.db, self.env)
         self.search = Search(self.db, self.env)

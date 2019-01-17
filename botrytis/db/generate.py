@@ -10,7 +10,7 @@ import sys
 
 import Bio.SeqIO
 
-from .model import Annotation, Gene, Transcript
+from .model import Annotation, Domain, Gene, Transcript
 
 
 _DEFAULT_OUTPUT = os.path.relpath(
@@ -44,23 +44,25 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
     )
 
     # Load genes from the genome summary
-    genes = []
+    genes = {}
     with open(os.path.join(data_dir, "genome_summary_per_gene.txt")) as f:
         for line in itertools.islice(f, 1, None):
             locus, _, _, length, start, stop, strand, name, contig, *_ = line.split('\t')
             seq = str(records_g[locus].seq)
-            genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(contig), seq, None))
+            genes[locus] = Gene(locus, int(length), int(start), int(stop), '+' in strand, name, int(contig), seq, None)
 
     # Load annotations from the PFAM to genes mapping
+    domains = {}
+    annots = []
     index = set()
-    pfam = []
     with open(os.path.join(data_dir, "pfam_to_genes.txt")) as f:
         for line in itertools.islice(f, 1, None):
             _, locus, contig, accession, name, description, start, stop, length, score, evalue = line.strip().split('\t')
+            domains[accession] = domain = Domain(accession, name, description, None)
             # remove duplicate annotations (indentical annotations in the same place with different scores)
             if (accession, start, stop) not in index:
                 index.add((accession, start, stop))
-                pfam.append(Annotation(locus, accession, name, description, int(length), int(start), int(stop), float(score), float(evalue), None))
+                annots.append(Annotation(genes[locus], domain, int(length), int(start), int(stop), float(score), float(evalue)))
 
     # Remove the old database
     if os.path.exists(output):
@@ -76,26 +78,33 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
                 sql.execute(statement)
 
         # Populate Genes
-        for gene in genes:
+        for gene in genes.values():
             sql.execute("INSERT INTO Gene VALUES (?, ?, ?, ?, ?, ?, ?, ?);", (
                 gene.locus,
                 gene.length,
                 gene.start,
                 gene.stop,
-                True if gene.strand == '+' else False,
+                gene.strand,
                 gene.name,
                 gene.contig,
-                gene.sequence
+                gene.sequence,
+            ))
+        sql.execute("COMMIT")
+
+        # Populate Domains
+        for domain in domains.values():
+            sql.execute("INSERT INTO Domain VALUES (?, ?, ?)", (
+                domain.accession,
+                domain.name,
+                domain.description,
             ))
         sql.execute("COMMIT")
 
         # Populate PFAM
-        for annot in pfam:
-            sql.execute("INSERT INTO Annotation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (
-                annot.locus,
-                annot.accession,
-                annot.name,
-                annot.description,
+        for annot in annots:
+            sql.execute("INSERT INTO Annotation VALUES (?, ?, ?, ?, ?, ?, ?);", (
+                annot.gene.locus,
+                annot.domain.accession,
                 annot.length,
                 annot.start,
                 annot.stop,

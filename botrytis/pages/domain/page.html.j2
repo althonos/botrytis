@@ -1,10 +1,10 @@
 {# The page to display information about a single annotation #}
 {% extends 'base.html.j2' %}
-{% set tab_active="Annotations" %}
+{% set tab_active="Domains" %}
 
 <!-- header -->
 {% block head %}
-  <title>The Botrytis Viewer - {{ annotations[0].accession }}</title>
+  <title>The Botrytis Viewer - {{ domain.accession }}</title>
 {% endblock %}
 
 <!-- content -->
@@ -15,7 +15,7 @@
       <div class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-sm">
         <div class="lh-100 secondary">
           <h1 class="display-5 icon icon-conceptual icon-structures">
-            {{ annotations[0].accession }} - <i>{{ annotations[0].name }}</i>
+            {{ domain.accession }} - <i>{{ domain.name }}</i>
           </h1>
         </div>
       </div>
@@ -23,7 +23,7 @@
       <div id="description" class="rounded shadow-sm bg-white p-3 my-3">
         <h2 class="mb1 text-info">Description</h2>
         <div class="mx-2 p-0 bg-white rounded">
-          <p>{{ annotations[0].description | sentence }}
+          <p>{{ domain.description | sentence }}
         </div>
       </div>
       <!-- cross-references box -->
@@ -32,15 +32,15 @@
         <div class="container">
           <div class="row">
             <div class="col">
-              <a href="//pfam.xfam.org/family/{{ annotations[0].accession }}">
-                Family {{ annotations[0].accession }}
+              <a href="//pfam.xfam.org/family/{{ domain.accession }}">
+                Family {{ domain.accession }}
               </a> on the <b>Pfam</b> database
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <a href="//www.uniprot.org/uniprot/?query=database:(type:pfam {{ annotations[0].accession[:7] }})">
-                Proteins with {{ annotations[0].accession[:7] }} domain
+              <a href="//www.uniprot.org/uniprot/?query=database:(type:pfam {{ domain.accession[:7] }})">
+                Proteins with {{ domain.accession[:7] }} domain
               </a> on <b>UniProtKB</b>
             </div>
           </div>
@@ -50,12 +50,12 @@
       <div id="annotations" class="rounded shadow-sm bg-white p-3 my-3">
         <h2 class="mb1 text-info">Genes</h2>
         <div class="mx-2 p-0 bg-white rounded">
-          {% for annotation in annotations %}
+          {% for annotation in domain.annotations %}
           <div class="media text-muted pt-3">
             <!-- <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect fill="#007bff" width="100%" height="100%"></rect><text fill="#007bff" dy=".3em" x="50%" y="50%">32x32</text></svg> -->
             <div class="media-body pb-2 mb-0 small lh-125 border-bottom">
-              <a class="text-secondary d-block" href="/gene/{{ annotation.locus }}">
-                <strong class="text-gray-dark">{{ annotation.locus }} - <i>{{ annotation.gene.name }}</i></strong>
+              <a class="text-secondary d-block" href="/gene/{{ annotation.gene.locus }}">
+                <strong class="text-gray-dark">{{ annotation.gene.locus }} - <i>{{ annotation.gene.name }}</i></strong>
               </a>
               <div class="row">
                 <div class="col-2">Start: {{ annotation.start }}</div>

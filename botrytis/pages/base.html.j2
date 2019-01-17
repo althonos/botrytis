@@ -47,7 +47,7 @@
           <!-- nav items -->
           <ul class="navbar-nav mr-auto">
             <!-- navbar links -->
-            {% for href, tab_name in [("/gene/", "Genes"), ("/annotation/", "Annotations")] %}
+            {% for href, tab_name in [("/gene/", "Genes"), ("/domain/", "Domains")] %}
               <li class="nav-item {% if tab_name==tab_active %}active{% endif %}">
                 <a class="nav-link" href="{{ href }}">{{ tab_name }}</a>
               </li>

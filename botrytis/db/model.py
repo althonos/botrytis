@@ -27,26 +27,30 @@ class Gene(typing.NamedTuple):
         return record
 
 
-class Annotation(typing.NamedTuple):
-    locus: str
+class Domain(typing.NamedTuple):
     accession: str
     name: str
     description: str
+    annotations: typing.Optional[typing.List['Annotation']]
+
+
+class Annotation(typing.NamedTuple):
+    gene: Gene
+    domain: Domain
     length: int
     start: int
     stop: int
     score: float
     evalue: float
-    gene: typing.Optional['Gene']
 
     def to_seq_feature(self):
         return Bio.SeqFeature.SeqFeature(
             type="misc_feature",
             strand=1,
             qualifiers={
-                'label': self.accession,
-                'note': [self.name, self.description],
-                'db_xref': f"PFAM:{self.accession}",
+                'label': self.domain.accession,
+                'note': [self.domain.name, self.domain.description],
+                'db_xref': f"PFAM:{self.domain.accession}",
             },
             location=Bio.SeqFeature.FeatureLocation(
                 start=self.start - self.gene.start,
