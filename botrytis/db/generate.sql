@@ -6,7 +6,7 @@ CREATE TABLE Gene(
     -- strand (true for direct, false otherwise)
     strand     BOOLEAN,
     name       TEXT,
-    chromosome INTEGER,
+    contig     INTEGER,
     -- gene sequence
     sequence   TEXT,
 

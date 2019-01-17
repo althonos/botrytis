@@ -19,7 +19,7 @@
           {% for name, id, cls in [
               ("Locus", "locus", "col-3 col-lg-7 d-block d-lg-none"),
               ("Locus - Name", "locus", "col-3 col-lg-7 d-none d-lg-block"),
-              ("Chromosome", "chromosome", "col-3 col-lg-2"),
+              ("Contig", "contig", "col-3 col-lg-2"),
               ("Start", "start", "col-2 col-lg-1"),
               ("Stop", "stop", "col-2 col-lg-1"),
               ("Length", "length", "col-2 col-lg-1")]
@@ -51,7 +51,7 @@
             <div class="col-3 col-lg-7 d-block d-lg-none">
               <span class="text-primary">{{ gene.locus }}</span>
             </div>
-            <div class="col-3 col-lg-2">{{ gene.chromosome }}</div>
+            <div class="col-3 col-lg-2">{{ gene.contig }}</div>
             <div class="col-2 col-lg-1">{{ gene.start }}</div>
             <div class="col-2 col-lg-1">{{ gene.stop }}</div>
             <div class="col-2 col-lg-1">{{ gene.length }}</div>

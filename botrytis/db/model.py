@@ -15,7 +15,7 @@ class Gene(typing.NamedTuple):
     stop: int
     strand: bool
     name: str
-    chromosome: int
+    contig: int
     sequence: int
     annotations: typing.Optional[typing.List['Annotation']]
 

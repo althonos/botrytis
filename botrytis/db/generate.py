@@ -9,7 +9,6 @@ import sqlite3
 import sys
 
 import Bio.SeqIO
-import tqdm
 
 from .model import Annotation, Gene, Transcript
 
@@ -48,9 +47,9 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
     genes = []
     with open(os.path.join(data_dir, "genome_summary_per_gene.txt")) as f:
         for line in itertools.islice(f, 1, None):
-            locus, _, _, length, start, stop, strand, name, chromosome, *_ = line.split('\t')
+            locus, _, _, length, start, stop, strand, name, contig, *_ = line.split('\t')
             seq = str(records_g[locus].seq)
-            genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(chromosome), seq, None))
+            genes.append(Gene(locus, int(length), int(start), int(stop), strand, name, int(contig), seq, None))
 
     # Load annotations from the PFAM to genes mapping
     index = set()
@@ -77,7 +76,7 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
                 sql.execute(statement)
 
         # Populate Genes
-        for gene in tqdm.tqdm(genes, desc="genes"):
+        for gene in genes:
             sql.execute("INSERT INTO Gene VALUES (?, ?, ?, ?, ?, ?, ?, ?);", (
                 gene.locus,
                 gene.length,
@@ -85,13 +84,13 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
                 gene.stop,
                 True if gene.strand == '+' else False,
                 gene.name,
-                gene.chromosome,
+                gene.contig,
                 gene.sequence
             ))
         sql.execute("COMMIT")
 
         # Populate PFAM
-        for annot in tqdm.tqdm(pfam, desc="pfam "):
+        for annot in pfam:
             sql.execute("INSERT INTO Annotation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (
                 annot.locus,
                 annot.accession,
@@ -106,7 +105,7 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
         sql.execute("COMMIT")
 
         # Populate transcript
-        for prot in tqdm.tqdm(records_p.values(), desc="prots"):
+        for prot in records_p.values():
             transcript, locus = prot.description.split(' | ', 2)[:2]
             sql.execute("INSERT INTO Transcript VALUES (?, ?, ?);", (
                 locus,

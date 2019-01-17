@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import functools
 import sqlite3
 import pkg_resources
 
@@ -10,6 +11,12 @@ class BotrytisDB(object):
 
     def __init__(self, path=pkg_resources.resource_filename(__name__, "botrytis.db")):
         self.db = path
+
+    @functools.lru_cache(maxsize=3)
+    def _columns(self, table):
+        cursor = sqlite3.connect(self.db).cursor()
+        cursor.execute(f"PRAGMA table_info({table})")
+        return [row[1] for row in cursor.fetchall()]
 
     def gene(self, locus):
         cursor = sqlite3.connect(self.db).cursor()
@@ -41,8 +48,7 @@ class BotrytisDB(object):
         cursor = sqlite3.connect(self.db).cursor()
         if not isinstance(page, int) or not isinstance(pagesize, int):
             raise TypeError("page and pagesize must be integers")
-        keys = {row[1] for row in cursor.execute("PRAGMA table_info('Gene')").fetchall()}
-        if sort not in keys:
+        if sort not in self._columns('Gene'):
             raise ValueError(f"unexpected sort key: {sort!r}")
         cursor.execute(
             f"""

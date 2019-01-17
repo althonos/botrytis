@@ -3,6 +3,7 @@
 import io
 import math
 import random
+import threading
 
 import Bio.Seq
 import Bio.SeqRecord
@@ -11,6 +12,7 @@ import cherrypy
 import jinja2
 
 from ..db import BotrytisDB
+from ..db.generate import generate_sql_db
 from . import filters
 
 
@@ -41,7 +43,7 @@ class Gene(BotrytisHandler):
         "start": "Start location",
         "stop": "End location",
         "length": "Length",
-        "chromosome": "Chromosome",
+        "contig": "Contig",
     }
 
     def gene(self, locus):
@@ -155,11 +157,21 @@ class Search(BotrytisHandler):
         return "Oopsie nothing found"
 
 
+class Blast(BotrytisHandler):
+
+    @cherrypy.expose
+    def p(self):
+        template = self.env.get_template("blast/base.html.j2")
+        return template.render(background=random.randint(1, 3))
 
 
 class BotrytisWebsite(BotrytisHandler):
 
     def __init__(self):
+
+        # --- Generate SQLite DB ---
+        cherrypy.log("   DB Generating SQL database...")
+        # DEBUG: generate_sql_db()
 
         # --- Variables ---
         super().__init__(
