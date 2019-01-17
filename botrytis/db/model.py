@@ -19,6 +19,9 @@ class Gene(typing.NamedTuple):
     sequence: int
     annotations: typing.Optional[typing.List['Annotation']]
 
+    def with_annotations(self, annotations):
+        return type(self)(*self[:-1], annotations=annotations)
+
     def to_seq_record(self):
         seq = Bio.Seq.Seq(self.sequence, alphabet=Bio.Alphabet.IUPAC.ambiguous_dna)
         record = Bio.SeqRecord.SeqRecord(seq, self.locus, description=self.name)
@@ -33,6 +36,8 @@ class Domain(typing.NamedTuple):
     description: str
     annotations: typing.Optional[typing.List['Annotation']]
 
+    def with_annotations(self, annotations):
+        return type(self)(*self[:-1], annotations=annotations)
 
 class Annotation(typing.NamedTuple):
     gene: Gene

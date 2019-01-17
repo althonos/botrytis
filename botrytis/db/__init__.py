@@ -31,24 +31,51 @@ class BotrytisDB(object):
         row = cursor.fetchone()
         if row is None:
             return None
-        gene = Gene(*row, annotations=[])
-        cursor.execute(
-            """
-            SELECT
-                 a.length, a.start, a.stop, a.score, a.evalue,
-                d.accession, d.name, d.description
-            FROM Annotation a, Domain d
-            WHERE a.locus=?
-              AND a.accession=d.accession
-            """,
-            (locus,)
-        )
-        for row in iter(cursor.fetchone, None):
-            domain = Domain(*row[5:], annotations=[])
-            annot = Annotation(gene, domain, *row[:5])
-            domain.annotations.append(annot)
-            gene.annotations.append(annot)
+        gene = Gene(*row, annotations=None)
         return gene
+
+    def _annotation_from_gene(self, cursor, gene):
+        cursor.execute(
+            f"""
+            SELECT a.length, a.start, a.stop, a.score, a.evalue,
+                   d.accession, d.name, d.description
+              FROM Annotation a, Domain d
+             WHERE a.accession=d.accession
+               AND a.locus=?
+            """,
+            (gene.locus,)
+        )
+        return [
+            Annotation(gene, Domain(*row[5:], annotations=None), *row[:5])
+            for row in iter(cursor.fetchone, None)
+        ]
+
+    def _annotation_from_domain(self, cursor, domain):
+        cursor.execute(
+            f"""
+            SELECT a.length, a.start, a.stop, a.score, a.evalue,
+                   g.locus, g.length, g.start, g.stop, g.strand, g.name, g.contig, g.sequence
+              FROM Annotation a, Gene g
+             WHERE a.locus=g.locus
+               AND a.accession=?
+            """,
+            (domain.accession,)
+        )
+        return [
+            Annotation(Gene(*row[5:], annotations=None), domain, *row[:5])
+            for row in iter(cursor.fetchone, None)
+        ]
+
+    def annotations(self, gene=None, domain=None):
+        cursor = sqlite3.connect(self.db).cursor()
+        if gene is None and domain is None:
+            raise ValueError("give either a gene or a domain")
+        elif gene is not None and domain is not None:
+            raise ValueError("give either a gene or a domain, not both")
+        elif domain is None:
+            return self._annotation_from_gene(cursor, gene)
+        else:
+            return self._annotation_from_domain(cursor, domain)
 
     def genes(self, sort="locus", page=1, pagesize=10, ascending=True):
         cursor = sqlite3.connect(self.db).cursor()
@@ -81,21 +108,7 @@ class BotrytisDB(object):
         row = cursor.fetchone()
         if row is None:
             return None
-        domain = Domain(*row, annotations=[])
-        cursor.execute(
-            """
-            SELECT
-                 a.length, a.start, a.stop, a.score, a.evalue,
-                 g.locus, g.length, g.start, g.stop, g.strand, g.name, g.contig, g.sequence
-            FROM Annotation a, Gene g
-            WHERE a.accession=?
-              AND a.locus=g.locus
-            """,
-            (accession,)
-        )
-        for row in iter(cursor.fetchone, None):
-            annot = Annotation(Gene(*row[5:], annotations=None), domain, *row[:5])
-            domain.annotations.append(annot)
+        domain = Domain(*row, annotations=None)
         return domain
 
     def transcript(self, locus):

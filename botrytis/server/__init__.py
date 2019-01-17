@@ -53,6 +53,8 @@ class Gene(BotrytisHandler):
         if gene is None:
             msg = f"No locus provided" if locus is None else f"No gene with locus {locus!r}"
             raise cherrypy.HTTPError(404, msg)
+        if gene.annotations is None:
+            gene = gene.with_annotations(self.db.annotations(gene=gene))
         template = self.env.get_template('gene/page.html.j2')
         return template.render(gene=gene)
 
@@ -95,6 +97,8 @@ class Domain(BotrytisHandler):
         if domain is None:
             msg = f"No domain with accession {accession!r}"
             raise cherrypy.HTTPError(404, msg)
+        if domain.annotations is None:
+            domain = domain.with_annotations(self.db.annotations(domain=domain))
         template = self.env.get_template("domain/page.html.j2")
         return template.render(domain=domain)
 
