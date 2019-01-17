@@ -2,6 +2,7 @@
 
 import io
 import math
+import random
 
 import Bio.Seq
 import Bio.SeqRecord
@@ -64,7 +65,8 @@ class Gene(BotrytisHandler):
             page = int(page)
         except ValueError:
             raise cherrypy.HTTPError(400, f"invalid parameter: page={sort!r}")
-        genes, total = self.db.genes(sort=sort, page=page, pagesize=self.PAGESIZE)
+        genes, total = self.db.genes(
+            sort=sort, page=page, pagesize=self.PAGESIZE)
         template = self.env.get_template('gene/index.html')
         return template.render(
             genes=genes,
@@ -73,11 +75,6 @@ class Gene(BotrytisHandler):
             total=math.ceil(total/self.PAGESIZE),
             sort_keys=self.SORT_KEYS
         )
-
-
-
-
-
 
 
 @cherrypy.popargs("accession")
@@ -99,7 +96,6 @@ class Annotation(BotrytisHandler):
         return template.render(page=page)
 
 
-
 @cherrypy.popargs("locus")
 class Download(BotrytisHandler):
 
@@ -115,7 +111,7 @@ class Download(BotrytisHandler):
         gene = None if locus is None else self.db.gene(locus)
         if gene is None:
             raise cherrypy.HTTPError(404)
-        return self._download(gene, 'fasta', 'chemical/seq-na-fasta', 'fa')
+        return self._download(gene, 'fasta', 'application/x-fasta', 'fa')
 
     def _download(self, gene, format, mimetype, extension):
         cherrypy.response.headers.update({
@@ -126,8 +122,6 @@ class Download(BotrytisHandler):
         record = gene.to_seq_record()
         Bio.SeqIO.write(record, res, format)
         return res.getvalue().encode()
-
-
 
 
 class BotrytisWebsite(BotrytisHandler):
@@ -153,4 +147,5 @@ class BotrytisWebsite(BotrytisHandler):
 
     @cherrypy.expose
     def index(self):
-        return """<html>Hello, world!</html>"""
+        template = self.env.get_template("splash/index.html")
+        return template.render(background=random.randint(1, 3))

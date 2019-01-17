@@ -1,26 +1,30 @@
-<meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="en">
 
-<head>
-{% block head %}
-    {% include '_style.html' %}
-    {% include '_icon.html' %}
-    <title>The Botrytis Viewer - Genes</title>
-{% endblock %}
-</head>
+  <head>
+  {% block head %}
+      {% include '_meta.html' %}
+      {% include '_style.html' %}
+      {% include '_icon.html' %}
+      <title>The Botrytis Viewer - Annotations</title>
+  {% endblock %}
+  </head>
 
-<body class="d-flex flex-column h-100">
-{% block body %}
+  <body class="d-flex flex-column h-100">
+  {% block body %}
 
-  {% include 'navbar.html' %}
+    {% include 'navbar.html' %}
 
-  <main role="main" class="flex-shrink">
-    <div class="jumbotron">
-      <p>Page: {{ page }}</p>
-    </div>
-  </main>
+    <main role="main" class="flex-shrink">
+      <div class="jumbotron">
+        <p>Page: {{ page }}</p>
+      </div>
+    </main>
 
-  {% include 'footer.html' %}
-  {% include '_scripts.html' %}
+    {% include 'footer.html' %}
+    {% include '_scripts.html' %}
 
-{% endblock %}
-</body>
+  {% endblock %}
+  </body>
+
+</html>

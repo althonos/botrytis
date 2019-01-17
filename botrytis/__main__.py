@@ -33,6 +33,10 @@ cherrypy.quickstart(
         "/static/img": {
             "tools.staticdir.on": True,
             "tools.staticdir.dir": os.path.join(cwd, "static", "img")
+        },
+        "/static/css": {
+            "tools.staticdir.on": True,
+            "tools.staticdir.dir": os.path.join(cwd, "static", "css")
         }
     }
 )
