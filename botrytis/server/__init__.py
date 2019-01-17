@@ -54,24 +54,31 @@ class Gene(BotrytisHandler):
         return template.render(gene=gene)
 
     @cherrypy.expose
-    def index(self, locus=None, sort="locus", page=1):
+    def index(self, locus=None, sort="locus", page=1, order="asc"):
         """Serve a gene index.
         """
         if locus is not None:
             return self.gene(locus)
         if sort not in self.SORT_KEYS:
             raise cherrypy.HTTPError(400, f"invalid parameter: sort={sort!r}")
+        if order not in {"asc", "desc"}:
+            raise cherrypy.HTTPError(400, f"invalid parameter: order={order!r}")
         try:
             page = int(page)
         except ValueError:
             raise cherrypy.HTTPError(400, f"invalid parameter: page={sort!r}")
         genes, total = self.db.genes(
-            sort=sort, page=page, pagesize=self.PAGESIZE)
+            sort=sort,
+            page=page,
+            pagesize=self.PAGESIZE,
+            ascending=order=="asc",
+        )
         template = self.env.get_template('gene/index.html')
         return template.render(
             genes=genes,
             page=page,
             sort=sort,
+            ascending=order=="asc",
             total=math.ceil(total/self.PAGESIZE),
             sort_keys=self.SORT_KEYS
         )
