@@ -4,7 +4,6 @@ import sqlite3
 import pkg_resources
 
 from .model import Gene, Annotation, Transcript
-from .generate import generate_db
 
 
 class BotrytisDB(object):
@@ -14,19 +13,60 @@ class BotrytisDB(object):
 
     def gene(self, locus):
         cursor = sqlite3.connect(self.db).cursor()
-        cursor.execute("SELECT * FROM gene WHERE locus=?", (locus,))
+        cursor.execute(
+            """
+            SELECT *
+            FROM gene
+            WHERE locus=?
+            """,
+            (locus,)
+        )
         row = cursor.fetchone()
         if row is None:
             return None
         gene = Gene(*row, annotations=[])
-        cursor.execute("SELECT * FROM annotation WHERE locus=?", (locus,))
+        cursor.execute(
+            """
+            SELECT *
+            FROM Annotation
+            WHERE locus=?
+            """,
+            (locus,)
+        )
         for row in cursor.fetchall():
             gene.annotations.append(Annotation(*row, gene=gene))
         return gene
 
+    def genes(self, sort="locus", page=1, pagesize=10):
+        cursor = sqlite3.connect(self.db).cursor()
+        if not isinstance(page, int) or not isinstance(pagesize, int):
+            raise TypeError("page and pagesize must be integers")
+        keys = {row[1] for row in cursor.execute("PRAGMA table_info('Gene')").fetchall()}
+        if sort not in keys:
+            raise ValueError(f"unexpected sort key: {sort!r}")
+        cursor.execute(
+            f"""
+            SELECT locus
+            FROM Gene
+            ORDER BY {sort}
+            LIMIT {pagesize} OFFSET {(page-1)*pagesize}
+            """,
+        )
+        genes = [self.gene(*row) for row in cursor.fetchall()]
+        total, *_ = cursor.execute("SELECT COUNT(*) FROM Gene").fetchone()
+        return (genes, total)
+
     def annotations(self, accession):
         cursor = sqlite3.connect(self.db).cursor()
-        cursor.execute("SELECT * FROM annotation WHERE accession=? ORDER BY locus", (accession,))
+        cursor.execute(
+            """
+            SELECT *
+            FROM Annotation
+            WHERE accession=?
+            ORDER BY locus
+            """,
+            (accession,)
+        )
         rows = cursor.fetchall()
         if not rows:
             return None
