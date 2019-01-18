@@ -194,7 +194,8 @@ class Search(BotrytisHandler):
             raise cherrypy.HTTPRedirect(f"/domain/{domain.accession}")
 
         # default search result
-        return "Oopsie nothing found"
+        template = self.env.get_template('search.html.j2')
+        return template.render(query=query)
 
 
 class Blast(BotrytisHandler):
@@ -269,7 +270,9 @@ class BotrytisWebsite(BotrytisHandler):
         )
 
         # --- Custom jinja2 filters ---
-        self.env.filters['sentence'] = filters.sentence
+        for name in dir(filters):
+            if not name.startswith('_'):
+                self.env.filters[name] = getattr(filters, name)
 
         # --- Subfolder handlers ---
         self.domain = Domain(self.db, self.env)
