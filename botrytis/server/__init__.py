@@ -3,22 +3,28 @@
 import io
 import math
 import random
+import re
+import shutil
+import tempfile
 import threading
 
+import Bio.Alphabet
 import Bio.Seq
 import Bio.SeqRecord
 import Bio.SeqIO
 import cherrypy
 import jinja2
+from Bio.Blast import Applications as BlastApp
 
 from ..db import BotrytisDB
+from ..db.blast import blastn, blastp, blastx
 from ..db.generate import generate_sql_db
 from . import filters
 
 
 class BotrytisHandler(object):
 
-    PAGESIZE = 10
+    PAGESIZE = 11
     SORT_KEYS = {}
 
     def __init__(self, db, env):
@@ -189,10 +195,56 @@ class Search(BotrytisHandler):
 
 class Blast(BotrytisHandler):
 
+    _RX_TRIM = re.compile("\s")
+    _RX_VALIDATE_N = re.compile(f"^[{Bio.Alphabet.IUPAC.ambiguous_dna.letters}]+$")
+    _RX_VALIDATE_P = re.compile(f"^[{Bio.Alphabet.IUPAC.protein.letters}]+$")
+
+    def _validate_sequence_n(self, seq):
+        if not self._RX_VALIDATE_N.match(seq):
+            raise cherrypy.HTTPError(400, "invalid nucleotide sequence")
+
+    def _validate_sequence_p(self, seq):
+        if not self._RX_VALIDATE_P.match(seq):
+            raise cherrypy.HTTPError(400, "invalid protein sequence")
+
+
+    @cherrypy.expose
+    def result(self, sequence, type):
+
+        sequence = self._RX_TRIM.sub("", sequence)
+
+        if type == "blastn" or type=="blastx":
+            if not self._RX_VALIDATE_N.match(sequence):
+                raise cherrypy.HTTPError(400, "invalid nucleotide sequence")
+            alphabet = Bio.Alphabet.IUPAC.extended_dna
+        elif type=="blastp":
+            if not self._RX_VALIDATE_P.match(sequence):
+                raise cherrypy.HTTPError(400, "invalid protein sequence")
+            alphabet = Bio.Alphabet.IUPAC.protein
+        else:
+            raise cherrypy.HTTPError(400, f"invalid type: {type!r}")
+
+        seq = Bio.Seq.Seq(sequence, alphabet)
+        record = Bio.SeqRecord.SeqRecord(id='query', seq=seq)
+        result = {"blastn": blastn, "blastp": blastp, "blastx": blastx}[type](record)
+
+        template = self.env.get_template("blast/result.html.j2")
+        return template.render(result=result)
+
     @cherrypy.expose
     def p(self):
-        template = self.env.get_template("blast/base.html.j2")
-        return template.render(background=random.randint(1, 3))
+        template = self.env.get_template("blast/p.html.j2")
+        return template.render()
+
+    @cherrypy.expose
+    def n(self):
+        template = self.env.get_template("blast/n.html.j2")
+        return template.render()
+
+    @cherrypy.expose
+    def x(self):
+        template = self.env.get_template("blast/x.html.j2")
+        return template.render()
 
 
 class BotrytisWebsite(BotrytisHandler):
@@ -220,8 +272,9 @@ class BotrytisWebsite(BotrytisHandler):
         self.gene = Gene(self.db, self.env)
         self.download = Download(self.db, self.env)
         self.search = Search(self.db, self.env)
+        self.blast = Blast(self.db, self.env)
 
     @cherrypy.expose
     def index(self):
         template = self.env.get_template("splash.html.j2")
-        return template.render(background=random.randint(1, 3))
+        return template.render()

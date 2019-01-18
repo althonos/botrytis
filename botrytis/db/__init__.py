@@ -9,7 +9,10 @@ from .model import Annotation, Domain, Gene, Transcript
 
 class BotrytisDB(object):
 
-    def __init__(self, path=pkg_resources.resource_filename(__name__, "botrytis.db")):
+    def __init__(
+        self,
+        path=pkg_resources.resource_filename(__name__, "runtime/botrytis.sqlite3")
+    ):
         self.db = path
 
     @functools.lru_cache(maxsize=3)

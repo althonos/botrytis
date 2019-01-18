@@ -9,12 +9,13 @@ import sqlite3
 import sys
 
 import Bio.SeqIO
+from Bio.Blast.Applications import NcbimakeblastdbCommandline
 
 from .model import Annotation, Domain, Gene, Transcript
 
 
 _DEFAULT_OUTPUT = os.path.relpath(
-    pkg_resources.resource_filename(__name__, "botrytis.db"),
+    pkg_resources.resource_filename(__name__, "runtime"),
     os.getcwd(),
 )
 
@@ -24,7 +25,13 @@ _DATA_DIRECTORY = os.path.relpath(
 )
 
 
-def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
+def generate_sql_db(
+    data_dir=_DATA_DIRECTORY,
+    output=os.path.join(_DEFAULT_OUTPUT, 'botrytis.sqlite3')
+):
+
+    output_dir = os.path.dirname(output)
+    os.makedirs(output_dir, exist_ok=True)
 
     def load_indexed(filename):
         return {
@@ -124,9 +131,36 @@ def generate_sql_db(data_dir=_DATA_DIRECTORY, output=_DEFAULT_OUTPUT):
         sql.execute("COMMIT")
 
 
+def generate_blastn_db(
+    data_dir=_DATA_DIRECTORY,
+    output=os.path.join(_DEFAULT_OUTPUT, 'botrytis')
+):
+    cline = NcbimakeblastdbCommandline(
+        dbtype='nucl',
+        out=output,
+        title="Botrytis",
+        input_file=os.path.join(_DATA_DIRECTORY, 'genes.fasta')
+    )
+    cline()
+
+def generate_blastp_db(
+    data_dir=_DATA_DIRECTORY,
+    output=os.path.join(_DEFAULT_OUTPUT, 'botrytis')
+):
+    cline = NcbimakeblastdbCommandline(
+        dbtype='prot',
+        out=output,
+        title="Botrytis",
+        input_file=os.path.join(_DATA_DIRECTORY, 'genes.fasta')
+    )
+    cline()
+
+
 if __name__ == "__main__":
     try:
         generate_sql_db()
+        generate_blastn_db()
+        generate_blastp_db()
     except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(1)

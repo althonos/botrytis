@@ -1,2 +1,87 @@
-{% extends 'base.html.h2' %}
-{% set active="BLAST" %}
+{% extends 'base.html.j2' %}
+{% set tab_active="BLAST" %}
+
+{% block title %}{% endblock %}
+
+{% block head %}
+  <title>The Botrytis Viewer - {{ title }}</title>
+{% endblock %}
+
+{% block main %}
+  <div class="jumbotron">
+    <div class="container">
+
+      <div class="row">
+        <p class="h2">{{ title }}</P>
+      </div>
+      <div class="row">
+        Run a {{ title }} query against the Botrytis genome.
+      </div>
+      <div class="row mb-2 p-2">
+        <span id="msg-empty">
+          <i class="text-muted">Paste the sequence as a raw sequence.</i>
+        </span>
+        <span id="msg-valid" class="d-none">
+          <i class="text-success">Valid IUPAC sequence.</i>
+        </span>
+        <span id="msg-invalid" class="d-none">
+          <i class="text-danger">Sequence contains invalid IUPAC characters</i>
+        </span>
+      </div>
+
+      <div class="row">
+        <form name="blast" action="/blast/result" method="post" class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <span id="blast-type" class="text-secondary input-group-text">{{ title }}</span>
+          </div>
+          <textarea name="sequence" class="form-control" oninput="validateSequence()" rows="5"></textarea>
+          <input type="hidden" name="type" value="{{ command }}"/>
+          <div class="input-group-append">
+            <button id="button-run" class="btn btn-outline-secondary" type="submit">Run!</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript">
+    function validateSequence() {
+      var regex = /^(\s|[{% block letters %}{% endblock %}])*$/i;
+      var form = document.forms["blast"];
+      var seq = document.forms["blast"]["sequence"];
+      var button = document.getElementById('button-run');
+
+      var msgValid = document.getElementById('msg-valid');
+      var msgInvalid = document.getElementById('msg-invalid');
+      var msgEmpty = document.getElementById('msg-empty');
+
+      button.disabled = true;
+      button.classList.remove('disabled');
+      button.classList.remove('btn-outline-secondary');
+      button.classList.remove('btn-outline-success');
+      button.classList.remove('btn-outline-danger');
+      msgValid.classList = "d-none";
+      msgInvalid.classList = "d-none";
+      msgEmpty.classList = "d-none";
+
+      if (seq.value.match(/^\s*$/)) {
+        button.classList.add('btn-outline-secondary');
+        button.classList.add('disabled');
+        msgEmpty.classList = "";
+      } else if (seq.value.match(regex)) {
+        button.setAttribute("type", "submit")
+        button.classList.add('btn-outline-success');
+        button.disabled = false;
+        msgValid.classList = "";
+      } else {
+        button.classList.add('disabled');
+        button.classList.add('btn-outline-danger');
+        msgInvalid.classList = "";
+      }
+    }
+    validateSequence();
+  </script>
+{% endblock %}

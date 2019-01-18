@@ -1,0 +1,57 @@
+{% extends 'base.html.j2' %}
+{% set tab_active="BLAST" %}
+
+{% block main %}
+  <div class="jumbotron">
+    <div class="container">
+      {% for alignment in result.alignments %}
+        {% set locus=alignment.hit_def.split(' | ')[0] %}
+        {% set hsp=alignment.hsps[0] %}
+        <a href="/gene/{{ locus }}">
+          <div class="container bg-white rounded shadow-lg mb-4">
+            <div class="row bg-info rounded shadow-sm">
+              <div class="col-3 col-lg-4 text-white icon icon-conceptual icon-dna">
+                {{ locus }}
+              </div>
+              <div class="col-3 col-lg-2 text-white">
+                Length: {{ hsp.align_length }}
+              </div>
+              <div class="col-3 col-lg-2 text-white">
+                Identity: {{ '{0:.1%}'.format(hsp.identities / hsp.align_length) }}
+              </div>
+              <div class="col-3 col-lg-2 text-light">
+                Score: {{ hsp.score }}
+              </div>
+              <div class="col-3 col-lg-2 text-light">
+                e-value: {{ '{0:5.2e}'.format(hsp.expect) }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="container my-2 p-3 text-monospace text-dark small">
+                  {% macro alignment(width, block) %}
+                    {% for i in range(0, (hsp.query|count), width) %}
+                      <div class="row d-none {{ block | safe }}">
+                        <div class="col">Query:   {{ hsp.query[i:i+width] }}</div>
+                      </div>
+                      <div class="row d-none {{ block | safe }}">
+                        <div class="col">         {{ hsp.match[i:i+width] }}</div>
+                      </div>
+                      <div class="row d-none {{ block | safe }}">
+                        <div class="col">Subject: {{ hsp.sbjct[i:i+width] }}</div>
+                      </div>
+                    {% endfor %}
+                  {% endmacro %}
+                  {{ alignment(140, "d-lg-block") }}
+                  {{ alignment(75, "d-md-block d-lg-none") }}
+                  {{ alignment(45, "d-sm-block d-md-none") }}
+                  {{ alignment(30, "d-block d-sm-none") }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
