@@ -8,12 +8,112 @@
 
 <!-- content -->
 {% block main %}
-  <div class="jumbotron bg-secondary text-white text-center">
-    <div class="container">
+  <div style="padding-bottom: 20%; background: url('/static/img/splash.jpg');    background-size: cover; background-repeat: fixed;" class="jumbotron bg-secondary text-white text-center mb-0">
+    <div class="container-fluid">
       <img class="img-fluid mb-5" src="/static/img/splash.gif" alt="">
-      <h1 class>The Botrytis Viewer</h1>
+      <div class="display-1">The Botrytis Viewer</div>
       <hr>
       <i class="h6">A website that makes you want to look at mold</i>
     </div>
   </div>
+
+  <div class="jumbotron">
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col col-lg-3 order-lg-2">
+            <div class="p-5">
+              <img class="img-fluid" type="text/png" src="/static/img/logos/bootstrap.svg" alt="">
+            </div>
+          </div>
+          <div class="col col-lg-9 order-lg-1">
+            <div class="p-5">
+              <h2 class="display-4">Modern</h2>
+              <p>
+                The Botrytis Viewer is built with <span class="text-primary">Bootstrap 4</span>,
+                providing a modern-looking and responsive UI with small-screen support. It also
+                integrates well with data-visualisation
+                <i class="text-muted">Rid your website of that 90's feeling!</i>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col col-lg-3 order-lg-1">
+            <div class="p-5">
+              <img class="img-fluid" type="text/png" src="/static/img/logos/cherrypy.png" alt="">
+            </div>
+          </div>
+          <div class="col col-lg-9 order-lg-2">
+            <div class="p-5">
+              <h2 class="display-4">Pythonic</h2>
+              <p>
+                The Botrytis Viewer is served using <span class="text-primary">CherryPy</span>,
+                a minimalistic Python web framework. Web pages are implemented using
+                oriented object programming to expose URL endpoints to the server.
+                The server supports abstract path handling, used for instance to
+                generate GenBank files on-the-fly from the sequences and annotations in
+                the database. <i class="text-muted">No, it's not Django!</i>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col col-lg-3 order-lg-2">
+            <div class="p-5">
+              <img class="img-fluid" type="text/png" src="/static/img/logos/sqlite.svg" alt="">
+            </div>
+          </div>
+          <div class="col col-lg-9 order-lg-1">
+            <div class="p-5">
+              <h2 class="display-4">No cheating</h2>
+              <p>
+                The relational model is stored as a manually defined SQL
+                relational database, embedded in the server as a single file
+                using <span class="text-primary">SQLite3</span>. On production
+                environment it could even be possible to generate the DB at
+                startup given the server should not restart often.
+                <i class="text-muted">No ORM was harmed during the development of this website!</i>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col col-lg-3 order-lg-1">
+            <div class="p-5">
+              <img class="img-fluid" type="text/png" src="/static/img/logos/jinja.svg" alt="">
+            </div>
+          </div>
+          <div class="col col-lg-9 order-lg-2">
+            <div class="p-5">
+              <h2 class="display-4">Extensible</h2>
+              <p>
+                HTML pages are generated using <span class="text-primary">Jinja2</span>,
+                a Python templating engine with support for template inheritance,
+                JIT compilation, and sandboxed execution.
+                <i class="text-muted">Guaranteed (almost) without Copy+Paste between pages!</i>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
 {% endblock %}
