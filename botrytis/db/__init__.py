@@ -96,7 +96,7 @@ class BotrytisDB(object):
         )
         genes = [self.gene(*row) for row in iter(cursor.fetchone, None)]
         total, *_ = cursor.execute("SELECT COUNT(*) FROM Gene").fetchone()
-        return (genes, total)
+        return genes, total
 
     def domain(self, accession):
         cursor = sqlite3.connect(self.db).cursor()
@@ -151,3 +151,25 @@ class BotrytisDB(object):
         cursor.execute("SELECT * FROM transcript WHERE locus=?", (locus,))
         row = cursor.fetchone()
         return Transcript(*row) if row is not None else None
+
+    def search_genes(self, query, page=1, pagesize=10):
+        cursor = sqlite3.connect(self.db).cursor()
+        cursor.execute(
+            f"""
+            SELECT locus
+            FROM gene
+            WHERE locus LIKE '%{query}%'
+               OR name  LIKE '%{query}%'
+            LIMIT {pagesize} OFFSET {(page-1)*pagesize}
+            """,
+        )
+        genes =  [self.gene(*row) for row in iter(cursor.fetchone, None)]
+        total, *_ = cursor.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM gene
+            WHERE locus LIKE '%{query}%'
+               OR name  LIKE '%{query}%'
+            """
+        ).fetchone()
+        return genes, total

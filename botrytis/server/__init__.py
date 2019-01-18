@@ -178,10 +178,9 @@ class Download(BotrytisHandler):
 class Search(BotrytisHandler):
 
     @cherrypy.expose
-    def index(self, query=None):
-        if query is None:
-            return "Nothing found"
-        query = query.strip()
+    def index(self, query=None, page=1):
+
+        self._validate_parameters(page=page)
 
         # redirect to a gene if given a gene ID
         gene = self.db.gene(query)
@@ -193,9 +192,21 @@ class Search(BotrytisHandler):
         if domain is not None:
             raise cherrypy.HTTPRedirect(f"/domain/{domain.accession}")
 
+        # query the db
+        if query is None:
+            genes, total = [], 0
+        else:
+            query = query.strip()
+            genes, total = self.db.search_genes(query, page=int(page))
+
         # default search result
         template = self.env.get_template('search.html.j2')
-        return template.render(query=query)
+        return template.render(
+            query=query,
+            results=genes,
+            total=math.ceil(total/self.PAGESIZE),
+            page=int(page)
+        )
 
 
 class Blast(BotrytisHandler):
