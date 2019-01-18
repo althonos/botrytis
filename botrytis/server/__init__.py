@@ -147,17 +147,21 @@ class Download(BotrytisHandler):
 
     @cherrypy.expose
     def gb(self, locus=None):
-        gene = None if locus is None else self.db.gene(locus)
+        gene = None if locus is None else self._gene(locus)
         if gene is None:
             raise cherrypy.HTTPError(404)
         return self._download(gene, 'gb', 'chemical/x-genbank', 'gb')
 
     @cherrypy.expose
     def fasta(self, locus=None):
-        gene = None if locus is None else self.db.gene(locus)
+        gene = None if locus is None else self._gene(locus)
         if gene is None:
             raise cherrypy.HTTPError(404)
         return self._download(gene, 'fasta', 'application/x-fasta', 'fa')
+
+    def _gene(self, locus):
+        gene = self.db.gene(locus)
+        return gene.with_annotations(self.db.annotations(gene=gene))
 
     def _download(self, gene, format, mimetype, extension):
         cherrypy.response.headers.update({

@@ -1,11 +1,15 @@
 {% extends 'base.html.j2' %}
 {% set tab_active="BLAST" %}
 
+{% block head %}
+  <title>The Botrytis Viewer - BLAST Results</title>
+{% endblock %}
+
 {% block main %}
   <div class="jumbotron">
     <div class="container">
       {% for alignment in result.alignments %}
-        {% set locus=alignment.hit_def.split(' | ')[0] %}
+        {% set locus=alignment.hit_def.split(' | ')[0].replace('BC1T', 'BC1G') %}
         {% set hsp=alignment.hsps[0] %}
         <a href="/gene/{{ locus }}">
           <div class="container bg-white rounded shadow-lg mb-4">

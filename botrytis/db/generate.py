@@ -151,7 +151,7 @@ def generate_blastp_db(
         dbtype='prot',
         out=output,
         title="Botrytis",
-        input_file=os.path.join(_DATA_DIRECTORY, 'genes.fasta')
+        input_file=os.path.join(_DATA_DIRECTORY, 'proteins.fasta')
     )
     cline()
 
