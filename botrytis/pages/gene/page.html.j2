@@ -4,6 +4,9 @@
 
 <!-- header -->
 {% block head %}
+  <!-- CSS for features-viewer -->
+  <link href="/static/feature-viewer/css/style.css" rel="stylesheet">
+  <!-- page title -->
   <title>The Botrytis Viewer - {{ gene.locus }}</title>
 {% endblock %}
 
@@ -73,6 +76,15 @@
           </div>
         </div>
       </div>
+      <!-- viewer -->
+      <div id="map" class="rounded shadow-lg bg-white p-3 my-3">
+        <h2 class="mb1 text-info">Features</h2>
+        <i class="small text-muted p-4">Left click to zoom, right click to reset scale</i>
+        <div class="container">
+          <div id="features-viewer"></div>
+        </div>
+      </div>
+
       <!-- annotations box -->
       <div id="annotations" class="rounded shadow-lg bg-white p-3 my-3">
         <h2 class="mb1 text-info">Annotations</h2>
@@ -103,6 +115,12 @@
 
 <!-- scripts -->
 {% block scripts %}
+
+  <!-- the feature viewer library & its dependencies -->
+  <script src="/static/d3/d3.min.js"></script>
+  <script src="/static/colormaps/dist/bundles/colormaps.umd.js"></script>
+  <script src="/static/feature-viewer/dist/feature-viewer.min.js"></script>
+
   <!-- a script to make sure the whole sequence in the `Sequence` box
        is always readable even when the window is resized -->
   <script type="text/javascript">
@@ -138,4 +156,40 @@
     window.onresize = pre_sequence;
     pre_sequence();
   </script>
+
+  <!-- a script to fill the features viewer -->
+  <script type="text/javascript">
+  colormaps.getColormap('viridis', 'hex').then(function(colormap) {
+    var ft = new FeatureViewer("{{ gene.sequence }}",
+       '#features-viewer',
+        {
+            showAxis: true,
+            showSequence: true,
+            brushActive: true, //zoom
+            toolbar:false, //current zoom & mouse position
+            bubbleHelp:false,
+            zoomMax:50 //define the maximum range of the zoom
+        });
+
+        {% for annotation in gene.annotations %}
+          ft.addFeature({
+            data: [{
+              x: {{ annotation.start - gene.start }},
+              y: {{ annotation.stop - gene.start }},
+              description: "{{ annotation.domain.name }}"
+            }],
+            name: "{{ annotation.domain.accession }}",
+            className: "test1", //can be used for styling
+            color: {% if annotation.evalue==0 %}
+                    colormap[0]
+                   {% else %}
+                    colormap[256-Math.floor(-Math.log10({{ annotation.evalue }})*256/100)]
+                   {% endif %},
+            filter: "{{ annotation.domain.accession[:7] }}",
+            type: "rect" // ['rect', 'path', 'line']
+          });
+        {% endfor %}
+      })
+  </script>
+
 {% endblock %}
