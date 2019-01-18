@@ -12,7 +12,7 @@
   <div class="jumbotron">
     <div class="container">
       <!-- title box -->
-      <div class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-sm">
+      <div class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-lg">
         <div class="lh-100 secondary">
           <h1 class="display-5 icon icon-conceptual icon-dna">
             {{ gene.locus }} - <i>{{ gene.name }}</i>
@@ -20,7 +20,7 @@
         </div>
       </div>
       <!-- location box -->
-      <div id="location" class="rounded shadow-sm bg-white p-3 my-3">
+      <div id="location" class="rounded shadow-lg bg-white p-3 my-3">
         <h2 class="mb1 text-info">Location</h2>
         <div class="container">
           <div class="row">
@@ -50,7 +50,7 @@
         </div>
       </div>
       <!-- sequence box -->
-      <div id="sequence" class="rounded shadow-sm bg-white p-3 my-3">
+      <div id="sequence" class="rounded shadow-lg bg-white p-3 my-3">
         <div class="row align-items-start">
           <div class="col-auto mr-auto">
             <h2 class="mb1 text-info">Sequence</h2>
@@ -74,7 +74,7 @@
         </div>
       </div>
       <!-- annotations box -->
-      <div id="annotations" class="rounded shadow-sm bg-white p-3 my-3">
+      <div id="annotations" class="rounded shadow-lg bg-white p-3 my-3">
         <h2 class="mb1 text-info">Annotations</h2>
         <div class="my-3 p-3 bg-white rounded">
           {% for annotation in gene.annotations %}

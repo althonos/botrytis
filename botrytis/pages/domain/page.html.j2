@@ -12,7 +12,7 @@
   <div class="jumbotron">
     <div class="container">
       <!-- title box -->
-      <div class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-sm">
+      <div class="d-flex align-items-center p-3 my-3 text-light bg-info rounded shadow-lg">
         <div class="lh-100 secondary">
           <h1 class="display-5 icon icon-conceptual icon-structures">
             {{ domain.accession }} - <i>{{ domain.name }}</i>
@@ -20,14 +20,14 @@
         </div>
       </div>
       <!-- description box -->
-      <div id="description" class="rounded shadow-sm bg-white p-3 my-3">
+      <div id="description" class="rounded shadow-lg bg-white p-3 my-3">
         <h2 class="mb1 text-info">Description</h2>
         <div class="mx-2 p-0 bg-white rounded">
           <p>{{ domain.description | sentence }}
         </div>
       </div>
       <!-- cross-references box -->
-      <div id="cross-references" class="rounded shadow-sm bg-white p-3 my-3">
+      <div id="cross-references" class="rounded shadow-lg bg-white p-3 my-3">
         <h2 class="mb1 text-info">Cross-References</h2>
         <div class="container">
           <div class="row">
@@ -47,8 +47,8 @@
         </div>
       </div>
       <!-- genes box -->
-      <div id="annotations" class="rounded shadow-sm bg-white p-3 my-3">
-        <h2 class="mb1 text-info">Genes</h2>
+      <div id="annotations" class="rounded shadow-lg bg-white p-3 my-3">
+        <h2 class="mb1 text-info">Annotations</h2>
         <div class="mx-2 p-0 bg-white rounded">
           {% for annotation in domain.annotations %}
           <div class="media text-muted pt-3">
