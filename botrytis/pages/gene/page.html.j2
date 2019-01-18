@@ -148,7 +148,13 @@
       var ds = "<div class=\"row no-borders\">";
       for (var i = 0; i < seq.length; i+=w) {
         di += "<div class=\"row text-secondary\">" + i + "</div>";
-        ds += "<div class=\"row align-items-start text-monospace\">" + seq.slice(i, i+w).padEnd(w, " ") + "</div>";
+        ds += "<div class=\"row align-items-start text-monospace\">" + seq.slice(i, i+w)
+
+        if (i+w >= seq.length) {
+          ds += '<span unselectable="on">' + ''.padEnd(seq.length - i - w, ' ') + '</span>'
+        }
+
+        ds += "</div>";
       }
       div_ind.innerHTML = di;
       div_seq.innerHTML = ds + "</div>";
