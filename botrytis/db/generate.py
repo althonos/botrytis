@@ -143,6 +143,7 @@ def generate_blastn_db(
     )
     cline()
 
+
 def generate_blastp_db(
     data_dir=_DATA_DIRECTORY,
     output=os.path.join(_DEFAULT_OUTPUT, 'botrytis')

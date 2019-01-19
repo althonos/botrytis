@@ -18,7 +18,7 @@ from Bio.Blast import Applications as BlastApp
 
 from ..db import BotrytisDB
 from ..db.blast import blastn, blastp, blastx
-from ..db.generate import generate_sql_db
+from ..db.generate import generate_sql_db, generate_blastn_db, generate_blastp_db
 from . import filters
 
 
@@ -265,11 +265,16 @@ class Blast(BotrytisHandler):
 
 class BotrytisWebsite(BotrytisHandler):
 
-    def __init__(self):
+    def __init__(self, generate=True):
 
         # --- Generate SQLite DB ---
-        cherrypy.log("   DB Generating SQL database...")
-        generate_sql_db()
+        if generate:
+            cherrypy.log("   DB Generating SQL database...")
+            generate_sql_db()
+            cherrypy.log("   DB Generating BLASTn database...")
+            generate_blastn_db()
+            cherrypy.log("   DB Generating BLASTp database...")
+            generate_blastp_db()
 
         # --- Variables ---
         super().__init__(

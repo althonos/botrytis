@@ -60,7 +60,9 @@ class build_js(setuptools.Command):
 class run(setuptools.Command):
 
     description = 'launch the website'
+    boolean_options = ['quickstart']
     user_options = [
+        ('quickstart', None, 'prevent databases from being generated at startup'),
         ('vendor-dir', None, 'path to the vendor directory'),
         ('img-dir', None, 'path to the images directory')
     ]
@@ -73,10 +75,13 @@ class run(setuptools.Command):
         self._cfg.read(self.distribution.find_config_files())
         self.vendor_dir = self._cfg.get('run', 'vendor-dir')
         self.img_dir = self._cfg.get('run', 'img-dir')
+        self.quickstart = None
 
     def finalize_options(self):
         self.vendor_dir = os.path.abspath(self.vendor_dir)
         self.img_dir = os.path.abspath(self.img_dir)
+        if self.quickstart is None and self._cfg.has_option('run', 'quickstart'):
+            self.quickstart = self._cfg.get('run', 'quickstart')
         if not os.path.isdir(self.vendor_dir):
             self.announce(f'directory {self.vendor_dir} does not exist', level=distutils.log.FATAL)
         if not os.path.isdir(self.img_dir):
@@ -86,7 +91,7 @@ class run(setuptools.Command):
         import cherrypy
         import botrytis.server
         cherrypy.quickstart(
-            botrytis.server.BotrytisWebsite(),
+            botrytis.server.BotrytisWebsite(generate=not self.quickstart),
             "/",
             {
                 "/static": {
