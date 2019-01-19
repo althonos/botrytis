@@ -269,7 +269,7 @@ class BotrytisWebsite(BotrytisHandler):
 
         # --- Generate SQLite DB ---
         cherrypy.log("   DB Generating SQL database...")
-        # DEBUG: generate_sql_db()
+        generate_sql_db()
 
         # --- Variables ---
         super().__init__(

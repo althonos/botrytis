@@ -125,6 +125,7 @@ dmypy.json
 ### Yarn ###
 yarn.lock
 .yarn-integrity
+package.json
 
 ### Dynamically installed static files ###
 ext/
