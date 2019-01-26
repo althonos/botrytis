@@ -42,7 +42,7 @@ class build_js(setuptools.Command):
     def run(self):
         """Run command."""
         if self.packages:
-            shutil.rmtree(self.vendor_dir)
+            shutil.rmtree(self.vendor_dir, ignore_errors=True)
             if self.has_command("yarn"):
                 shutil.rmtree('yarn.lock', ignore_errors=True)
                 shutil.rmtree('package.json', ignore_errors=True)
@@ -63,23 +63,30 @@ class run(setuptools.Command):
     boolean_options = ['quickstart']
     user_options = [
         ('quickstart', None, 'prevent databases from being generated at startup'),
-        ('vendor-dir', None, 'path to the vendor directory'),
-        ('img-dir', None, 'path to the images directory')
+        ('vendor-dir=', None, 'path to the vendor directory'),
+        ('img-dir=', None, 'path to the images directory'),
+        ('host=', None, 'socket host to listen to'),
+        ('port=', None, 'socket port to listen to'),
     ]
 
     def initialize_options(self):
         self._cfg = configparser.ConfigParser(default_section='run', defaults={
             'vendor-dir': 'ext',
-            'img-dir': os.path.join('static', 'img')
+            'img-dir': os.path.join('static', 'img'),
+            'host': '127.0.0.1',
+            'port': '8080',
         })
         self._cfg.read(self.distribution.find_config_files())
         self.vendor_dir = self._cfg.get('run', 'vendor-dir')
         self.img_dir = self._cfg.get('run', 'img-dir')
+        self.host = self._cfg.get('run', 'host')
+        self.port = self._cfg.get('run', 'port')
         self.quickstart = None
 
     def finalize_options(self):
         self.vendor_dir = os.path.abspath(self.vendor_dir)
         self.img_dir = os.path.abspath(self.img_dir)
+        self.port = int(self.port)
         if self.quickstart is None and self._cfg.has_option('run', 'quickstart'):
             self.quickstart = self._cfg.get('run', 'quickstart')
         if not os.path.isdir(self.vendor_dir):
@@ -94,6 +101,10 @@ class run(setuptools.Command):
             botrytis.server.BotrytisWebsite(generate=not self.quickstart),
             "/",
             {
+                "global" : {
+                    "server.socket_host": self.host,
+                    "server.socket_port": self.port,
+                },
                 "/static": {
                     "tools.staticdir.on": True,
                     "tools.staticdir.dir": self.vendor_dir,
