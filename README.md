@@ -2,6 +2,9 @@
 
 *A minimal webapp to display Botrytis cinerea sequencing data using CherryPy, Jinja2 and Bootstrap*
 
+[![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square&logo=github)](https://github.com/althonos/botrytis)
+[![Docker](https://img.shields.io/badge/docker%20build-automatic-blue.svg?maxAge=86400&style=flat-square&logo=docker)](https://hub.docker.com/r/althonos/botrytis/)
+
 ## Usage
 
 Clone the repository and download frontend requirements using:
