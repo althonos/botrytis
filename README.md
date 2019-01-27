@@ -1,6 +1,6 @@
 # The Botrytis Viewer
 
-*A small webapp to display Botrytis cinerea sequencing data*
+*A minimal webapp to display Botrytis cinerea sequencing data using CherryPy, Jinja2 and Bootstrap*
 
 ## Usage
 
