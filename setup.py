@@ -37,7 +37,10 @@ class build_js(setuptools.Command):
             self.packages = list(map(str.strip, packages.split(sep)))
 
     def has_command(self, cmd):
-        return subprocess.check_call([cmd, "--version"], stdout=subprocess.PIPE) == 0
+        try:
+            return subprocess.check_call([cmd, "--version"], stdout=subprocess.PIPE) == 0
+        except OSError:
+            return False
 
     def run(self):
         """Run command."""
